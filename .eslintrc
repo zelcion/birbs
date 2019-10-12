@@ -1,0 +1,44 @@
+{
+  "parser": "@typescript-eslint/parser",
+  "plugins": [
+    "@typescript-eslint"
+  ],
+  "env": {
+    "es6": true,
+    "node": true
+  },
+  "globals": {
+    "Atomics": "readonly",
+    "SharedArrayBuffer": "readonly"
+  },
+  "parserOptions": {
+    "ecmaVersion": 2018,
+    "sourceType": "module"
+  },
+  "extends": [
+    "plugin:@typescript-eslint/recommended"
+  ],
+  "rules": { //individual rule config for typescript
+    "@typescript-eslint/type-annotation-spacing": ["error", {"before": true} ],
+    "@typescript-eslint/indent": [ "error", 2],
+    "@typescript-eslint/no-parameter-properties": ["off"],
+    "@typescript-eslint/no-use-before-define": ["off"],
+    "@typescript-eslint/no-unused-vars": ["error"],
+    "@typescript-eslint/explicit-function-return-type": ["error"],
+    "no-trailing-spaces": ["warn"],
+    "@typescript-eslint/semi": ["error", "always"],
+    "eol-last": ["error", "always"],
+    "max-len": ["warn" , { "code" : 120}],
+    "no-multiple-empty-lines": ["error", { "max": 1, "maxEOF": 1 }],
+    "no-warning-comments": ["warn", { "terms": ["TODO", "FIX"], "location": "start"}],
+    "sort-keys": ["warn", "asc", {"natural": true}],
+    "sort-vars": ["warn", { "ignoreCase": true }],
+    "sort-imports": ["error", {
+      "ignoreCase": true,
+      "ignoreDeclarationSort": false,
+      "ignoreMemberSort": false,
+      "memberSyntaxSortOrder": ["none", "all", "multiple", "single"]
+    }],
+    "quotes": ["error", "single"]
+  }
+}
