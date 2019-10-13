@@ -19,41 +19,39 @@ npm i birbs --save
 
 ## How to use it?
 1. You need an `EventPublisher`, which is the manager of events. You should always `broadcast()` your events through it!
-```javascript
-const Birbs = require('birbs'); // Prefer import sintax if possible
-
-const myEventPublisher = new Birbs.EventPublisher();
-```
+   ```javascript
+   const Birbs = require('birbs'); // Prefer import syntax if possible
+   const myEventPublisher = new Birbs.EventPublisher();
+   ```
 2. Now tell it that you just got yourself the fanciest `EventGroup` in the town!
-```javascript
-const fancyEventGroup = new Birbs.EventGroup('FancyName');
-
-myEventPublisher.submitGroup(fancyEventGroup);
-// You can unsubmit your group with .unsubmitGroup()
-```
+   ```javascript
+   const fancyEventGroup = new Birbs.EventGroup('FancyName');
+   
+   myEventPublisher.submitGroup(fancyEventGroup);
+   // You can unsubmit your group with .unsubmitGroup()
+   ```
 3. Then you should create your event to be published.
-```javascript
-class NiceEvent extends Birbs.DomainEvent {
-  identifier = "eventFiredWithFancyEventGroup";
-  // Here goes any data/methods that you want!
-
-  // It also can have a constructor for custom data
-  // during runtime
-};
-
-const niceEventInstance = new NiceEvent;
-```
+   ```javascript
+   class NiceEvent extends Birbs.DomainEvent {
+       identifier = "eventFiredWithFancyEventGroup";
+     // Here goes any data/methods that you want!
+     // It also can have a constructor for custom data
+     // during runtime
+   };
+   const niceEventInstance = new NiceEvent;
+   ```
 4. Now pair it up with a behavior you need to happen when it's fired and listen to it.
-```javascript
-const eventPair = new Birbs.EventPair(niceEventInstance, voidMethodOrFunction);
+   ```javascript
+   const eventPair = new Birbs.EventPair(niceEventInstance,
+   voidMethodOrFunction);
 
-myEventPublisher.listen([eventPair], fancyEventGroup);
-```
+   myEventPublisher.listen([eventPair], fancyEventGroup);
+   ```
 5. Fire!
-```javascript
-myEventPublisher.broadcast(niceEventInstance, fancyEventGroup);
-// Then your voidMethodOrFunction should have been called!
-```
+   ```javascript
+   myEventPublisher.broadcast(niceEventInstance, fancyEventGroup);
+   // Then your voidMethodOrFunction should have been called!
+   ```
 
 ### Things to notice:
 1. Your event behavior function recieves as an argument the event itself, which makes possible for interesting behaviour and methods calling to be possible.
