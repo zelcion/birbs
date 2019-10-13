@@ -1,6 +1,6 @@
 {
   "name": "birbs",
-  "version": "0.1.0",
+  "version": "0.1.01",
   "description": "Capture and admire all your joyful events with this event manager and encapsulator!",
   "main": "index.js",
   "types": "./lib/index.d.ts",
