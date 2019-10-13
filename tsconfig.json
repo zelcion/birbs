@@ -20,5 +20,8 @@
   "inlcude": [
     "src/*",
     "src/**/*"
+  ],
+  "exclude": [
+    "test/*"
   ]
 }
