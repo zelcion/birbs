@@ -1,4 +1,3 @@
-import 'reflect-metadata';
 import EventEmitter from 'events';
 
 export abstract class DomainEvent {
@@ -84,6 +83,14 @@ export class EventPublisher {
 
   private pickGroup(name : string) : EventGroup | undefined {
     return this.eventGroups.find((group) => group.name === name);
+  }
+
+  public get groupsNames() : string[] {
+    return this.eventGroups.map((group) => group.name);
+  }
+
+  public get groups() : EventGroup[] {
+    return this.eventGroups;
   }
 
 };
