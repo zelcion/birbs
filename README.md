@@ -33,7 +33,7 @@ myEventPublisher.submitGroup(fancyEventGroup);
 ```
 3. Then you should create your event to be published.
 ```javascript
-class niceEvent extends Birbs.DomainEvent {
+class NiceEvent extends Birbs.DomainEvent {
   identifier = "eventFiredWithFancyEventGroup";
   // Here goes any data/methods that you want!
 
