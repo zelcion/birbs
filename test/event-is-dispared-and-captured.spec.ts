@@ -33,9 +33,9 @@ describe('Event is dispared and captured', () => {
     const eventInstance = new MyEvent;
 
     const eventPair : EventPair = new EventPair(eventInstance, addToVariable);
-    eventHandler.listen(eventGroup.name, [eventPair]);
+    eventHandler.listen([eventPair], eventGroup);
 
     expect(variableToBeModifiedByEvent).to.be.equal(5);
-    eventHandler.broadcast(eventInstance, eventGroup.name);
+    eventHandler.broadcast(eventInstance, eventGroup);
   });
 });

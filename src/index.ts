@@ -53,21 +53,21 @@ export type EventAction = (event : DomainEvent) => void;
 export class EventPublisher {
   private eventGroups : EventGroup[] = [];
 
-  public broadcast(event : DomainEvent, eventGroupName : string) : void {
+  public broadcast(event : DomainEvent, eventGroup : EventGroup) : void {
     console.log(this.eventGroups);
-    const eventGroup = this.pickGroup(eventGroupName);
+    const currentEventGroup = this.pickGroup(eventGroup);
 
-    if (eventGroup === undefined) return;
+    if (currentEventGroup === undefined) return;
 
-    eventGroup.publish(event);
+    currentEventGroup.publish(event);
   }
 
-  public listen(eventGroupName : string, eventPairs : EventPair[] ) : void {
-    const eventGroup = this.pickGroup(eventGroupName);
+  public listen(eventPairs : EventPair[], eventGroup : EventGroup) : void {
+    const currentEventGroup = this.pickGroup(eventGroup);
 
-    if (eventGroup === undefined) throw 'NO EVENT GROUP REGISTERED WITH THAT NAME';
+    if (currentEventGroup === undefined) throw 'NO EVENT GROUP REGISTERED WITH THAT NAME';
 
-    eventGroup.once(eventPairs);
+    currentEventGroup.once(eventPairs);
   }
 
   public submitGroup(eventGroup : EventGroup) : void {
@@ -81,8 +81,8 @@ export class EventPublisher {
     this.eventGroups.splice(index);
   }
 
-  private pickGroup(name : string) : EventGroup | undefined {
-    return this.eventGroups.find((group) => group.name === name);
+  private pickGroup(eventGroup : EventGroup) : EventGroup | undefined {
+    return this.eventGroups.find((group) => group.name === eventGroup.name);
   }
 
   public get groupsNames() : string[] {

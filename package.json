@@ -1,8 +1,8 @@
 {
   "name": "birbs",
-  "version": "0.1.01",
+  "version": "0.1.12",
   "description": "Capture and admire all your joyful events with this event manager and encapsulator!",
-  "main": "index.js",
+  "main": "./lib/index.js",
   "types": "./lib/index.d.ts",
   "scripts": {
     "test": "mocha",
