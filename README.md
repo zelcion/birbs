@@ -3,6 +3,8 @@ Capture and admire all your joyful events with this event manager and encapsulat
 
 --------------------
 #### A Quick Heads'up
+**THIS README IS OUTDATED AND WILL BE REWRITTEN SOON**
+
 > This initial implementation will be deprecated in the near future in favor of a much more nice syntax and classes you are yet to see. So please, be warned to not use this before the planned `0.5` version, but feel welcome to open issues and feature requests!
 ## Why Birbs?
 
