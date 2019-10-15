@@ -1,5 +1,6 @@
 import { getStringFromSymbol, setSymbol } from './utils';
 import { Behaviour } from './behaviour';
+import { BehaviourType } from '../lib/types';
 import EventEmitter from 'events';
 import { TeardownStrategies } from './types';
 
@@ -8,7 +9,7 @@ class CustomEmitter extends EventEmitter {};
 export class Container {
   private readonly _name : symbol;
   private emitter : CustomEmitter = new CustomEmitter;
-  public behaviours : Behaviour[] = [];
+  public behaviours : Map<symbol, Behaviour> = new Map();
   private readonly teardownStrategy : TeardownStrategies;
   // public subCastings : Container[]; //not to be done right now
 
@@ -27,7 +28,7 @@ export class Container {
 
   public publish(behaviour : Behaviour | symbol) : void {
     const behaviourToBeEmitted : Behaviour = (typeof behaviour === 'symbol')?
-      this.behaviours.find((item) => item.identifier === behaviour) :
+      this.behaviours.get(behaviour) :
       behaviour;
 
     this.emitter.emit(behaviourToBeEmitted.identifier, behaviourToBeEmitted);
@@ -45,7 +46,7 @@ export class Container {
         this.emitter.removeAllListeners(behaviour.identifier);
       });
 
-      this.behaviours = [];
+      this.behaviours = new Map();
       return;
     }
 
@@ -53,15 +54,22 @@ export class Container {
   }
 
   private filterOnceBehaviours() : void {
-    const resultingBehaviours : Behaviour[] = this.behaviours.filter((behaviour) => {
-      if (behaviour.type === 'once') {
-        this.emitter.removeAllListeners(behaviour.identifier);
-        return false;
-      }
-      return true;
+    this.behaviours.forEach((behaviour) => {
+      if (behaviour.type === 'once') this.emitter.removeAllListeners(behaviour.identifier);
     });
 
-    this.behaviours = resultingBehaviours;
+    this.getBehaviourListByType('once').forEach((behaviour) => {
+      this.behaviours.delete(behaviour.identifier);
+    });
+  }
+
+  private getBehaviourListByType(type : BehaviourType) : Behaviour[] {
+    const list : Behaviour[] = [];
+    this.behaviours.forEach((behaviour) => {
+      if (behaviour.type === type) list.push(behaviour);
+    });
+
+    return list;
   }
 
   public flush() : void {
@@ -82,13 +90,13 @@ export class Container {
     if (Array.isArray(behaviour)) {
       behaviour.forEach((event) => {
         this.signBehaviourByType(event);
-        this.behaviours.push(event);
+        this.behaviours.set(event.identifier, event);
       });
       return;
     }
 
     this.signBehaviourByType(behaviour);
-    this.behaviours.push(behaviour);
+    this.behaviours.set(behaviour.identifier, behaviour);
     return;
   }
 
@@ -96,14 +104,12 @@ export class Container {
     if (Array.isArray(behaviour)) {
       behaviour.forEach((event) => {
         this.emitter.removeAllListeners(event.identifier);
-        const index = this.behaviours.indexOf(event);
-        this.behaviours.splice(index, 1);
+        this.behaviours.delete(event.identifier);
       });
       return;
     }
 
-    const index = this.behaviours.indexOf(behaviour);
-    this.behaviours.splice(index, 1);
+    this.behaviours.delete(behaviour.identifier);
   }
 
   // Add Actions to Behaviours [By Symbol or By itself]

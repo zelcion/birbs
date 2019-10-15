@@ -45,7 +45,9 @@ _For a more detailed explanation of each class, refer to the `API Reference` sec
 2. Create (and/or extend) your Behaviour.
    ```javascript
    class MyNewBehaviour extends Behaviour {
-     myExtendedProperty = 'hello world';
+      get myExtendedProperty () {
+        return 'hello world';
+      }
    };
 
    const newBehaviourIdentifier = Symbol('BehaviourId');
