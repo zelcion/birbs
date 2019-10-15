@@ -73,8 +73,10 @@ _For a more detailed explanation of each class, refer to the `API Reference` sec
    ```
    Your Actions functions/callbacks recieves as an argument the Behaviour itself, which makes possible for interesting applications to be made.
 
-4. Broadcast your new behaviour!
+4. Listen, and Broadcast your new behaviour!
    ```javascript
+   myEventManager.listen(newBehaviourInstance, contextIdentifier);
+
    myEventManager.broadcast(
      newBehaviourIdentifier,
      contextIdentifier
