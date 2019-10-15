@@ -1,6 +1,6 @@
 import { getStringFromSymbol, setSymbol } from './utils';
 import { Behaviour } from './behaviour';
-import { BehaviourType } from '../lib/types';
+import { BehaviourType } from './types';
 import EventEmitter from 'events';
 import { TeardownStrategies } from './types';
 
