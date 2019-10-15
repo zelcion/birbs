@@ -15,7 +15,7 @@ export class EventManager {
     return this;
   }
 
-  public broadcast(behaviour : Behaviour, container : Container | symbol) : EventManager {
+  public broadcast(behaviour : Behaviour | symbol, container : Container | symbol) : EventManager {
     this.containers.get(getIdentifierOf(container)).publish(behaviour);
     return this;
   }
@@ -29,4 +29,6 @@ export class EventManager {
     this.containers.get(getIdentifierOf(container)).resign(behaviour);
     return this;
   }
+
+  // Add Actions to behaviours [By symbols or itself] [optional argument: to a single container or all references]
 };

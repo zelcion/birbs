@@ -25,8 +25,12 @@ export class Container {
     this.teardownStrategy = teardownStrategy;
   }
 
-  public publish(behaviour : Behaviour) : void {
-    this.emitter.emit(behaviour.identifier, behaviour);
+  public publish(behaviour : Behaviour | symbol) : void {
+    const behaviourToBeEmitted : Behaviour = (typeof behaviour === 'symbol')?
+      this.behaviours.find((item) => item.identifier === behaviour) :
+      behaviour;
+
+    this.emitter.emit(behaviourToBeEmitted.identifier, behaviourToBeEmitted);
 
     this.teardown();
   }
@@ -101,4 +105,6 @@ export class Container {
     const index = this.behaviours.indexOf(behaviour);
     this.behaviours.splice(index, 1);
   }
+
+  // Add Actions to Behaviours [By Symbol or By itself]
 };

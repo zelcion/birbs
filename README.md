@@ -3,14 +3,19 @@ Capture and admire all your joyful events with this event manager and encapsulat
 
 --------------------
 #### A Quick Heads'up
-**THIS README IS OUTDATED AND WILL BE REWRITTEN SOON**
 
-> This initial implementation will be deprecated in the near future in favor of a much more nice syntax and classes you are yet to see. So please, be warned to not use this before the planned `0.5` version, but feel welcome to open issues and feature requests!
-## Why Birbs?
+> We updated to version `0.5`, which is the first production-ready package!
+> There are still some things on the roadmap which will greatly increase Birbs' functionality. When those are implemented we will be moving to our `1.x.x` packages.
+
+## What is Birbs? Why Birbs?
+
+Birbs is an Event encapsulator that gives context and extensability to node's plain events. It's objective is to bring the marvels of encapsulation and polymorfism of OOP into the world of Events!
+
+For instance, with it you can reuse a `Behaviour` of your application in different contexts, let's say an error handler for an API response. Just bind the handler to a `Behaviour` and `.broadcast()` it to it's `Container`!
 
 Birbs is internally built on Node's internal robust events engine, and got no other dependency at all! Also it helps you to encapsulate expected behaviors in namespaces for you to have a much more wholesome (and controlled) experience when dealing with events. 
 
-Personally, I find it helpful to dispatch events with multiple listeners, which are to be executed only once, and are instantiated every call to expect a response. [See `EventGroup`]
+Personally, I find it helpful to dispatch events with multiple listeners, which are to be executed only once, and are instantiated every call to expect a response.
 
 Oh, it also uses typescript!
 
@@ -20,45 +25,60 @@ npm i birbs --save
 ```
 
 ## How to use it?
-1. You need an `EventPublisher`, which is the manager of events. You should always `broadcast()` your events through it!
+_For a more detailed explanation of each class, refer to the `API Reference` section._
+1. Import Birbs' classes to your project, set the Container and EventManager, and add the context to the Manager.
    ```javascript
-   const Birbs = require('birbs'); // Prefer import syntax if possible
-   const myEventPublisher = new Birbs.EventPublisher();
+   import { Behaviour, Container, EventManager } from 'birbs'
+   //                      or
+   const { Behaviour, Container, EventManager } = require('birbs');
+
+   const myEventManager = new EventManager();
+   const contextIdentifier = Symbol('ContainerIdentity')
+   const myContext = new Container(contextIdentifier, 'once');
+   // see flushStrategies to know about this second argument
+   myEventManager.addContainer(myContext);
    ```
-2. Now tell it that you just got yourself the fanciest `EventGroup` in the town!
+   One important thing to notice is that although you can use pure strings as Identifiers, Birbs uses symbols internally, so if you opt to use strings to name your Containers/Behaviours you will need to save them to constants or you won't be able to fetch them later. So keep in mind that symbols are a good practice with Birbs, and they enable you to get a better decoupling because you will never really need to refer to the original class instance.
+
+   Oh, also you will be able to do a really clever use of some methods when the same behaviour is shared across contexts ;)
+
+2. Create (and/or extend) your Behaviour.
    ```javascript
-   const fancyEventGroup = new Birbs.EventGroup('FancyName');
-   
-   myEventPublisher.submitGroup(fancyEventGroup);
-   // You can unsubmit your group with .unsubmitGroup()
-   ```
-3. Then you should create your event to be published.
-   ```javascript
-   class NiceEvent extends Birbs.DomainEvent {
-       identifier = "eventFiredWithFancyEventGroup";
-     // Here goes any data/methods that you want!
-     // It also can have a constructor for custom data
-     // during runtime
+   class MyNewBehaviour extends Behaviour {
+     myExtendedProperty = 'hello world';
    };
-   const niceEventInstance = new NiceEvent;
+
+   const newBehaviourIdentifier = Symbol('BehaviourId');
+
+   const newBehaviourInstance = new MyNewBehaviour(
+     { identifier: newBehaviourIdentifier, type: 'always' }
+    )
+   // see Behaviour Types in the API Reference 
    ```
-4. Now pair it up with a behavior you need to happen when it's fired and listen to it.
+
+3. Create and add Actions to take when the event is fired.
    ```javascript
-   const eventPair = new Birbs.EventPair(niceEventInstance,
-   voidMethodOrFunction);
-
-   myEventPublisher.listen([eventPair], fancyEventGroup);
+   const showMeTheWorld = (behaviour) => {
+     console.log(behaviour.myExtendedProperty);
+   };
+   const showMeTheWorldIdentifier = Symbol('showMeTheWorld');
+   // It is possible to overwrite an action if you .bindAction()
+   // again with the same identifier (if it's a symbol).
+   newBehaviourInstance.bindAction(
+     showMeTheWorld,
+     showMeTheWorldIdentifier
+   );
    ```
-5. Fire!
+   Your Actions functions/callbacks recieves as an argument the Behaviour itself, which makes possible for interesting applications to be made.
+
+4. Broadcast your new behaviour!
    ```javascript
-   myEventPublisher.broadcast(niceEventInstance, fancyEventGroup);
-   // Then your voidMethodOrFunction should have been called!
+   myEventManager.broadcast(
+     newBehaviourIdentifier,
+     contextIdentifier
+   );
+   // Should log 'hello world'
    ```
 
-### Things to notice:
-1. Your event behavior function recieves as an argument the event itself, which makes possible for interesting behaviour and methods calling to be possible.
-2. The `EventPair` class is to be deprecated in favour of a new method on extended `DomainEvent` classes.
-3. For now there is only one `.listen()` method which loads the `EventGroup` with the expected behaviour.
-
-## Birbs Behaviour
-For now, Birbs flushes the `EventGroup` listeners everytime any event of that group is broadcasted to it, so always listen to them again when you `.broadcast()` to the group.
+## API Reference
+> Under construction.
