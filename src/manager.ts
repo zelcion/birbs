@@ -1,4 +1,4 @@
-import { Behaviour } from './behaviour';
+import { Behaviour } from './behaviour/behaviour';
 import { Container } from './container';
 import { getIdentifierOf } from './utils';
 
@@ -15,8 +15,18 @@ export class EventManager {
     return this;
   }
 
-  public broadcast(behaviour : Behaviour | symbol, container : Container | symbol) : EventManager {
-    this.containers.get(getIdentifierOf(container)).publish(behaviour);
+  public broadcast(behaviour : Behaviour | symbol, container ?: Container | symbol) : EventManager {
+    const chosenContainer = this.containers.get(getIdentifierOf(container));
+
+    if (chosenContainer === undefined) {
+      this.containers.forEach(
+        (context) => context.publish(behaviour)
+      );
+
+      return this;
+    }
+
+    chosenContainer.publish(behaviour);
     return this;
   }
 
@@ -30,5 +40,4 @@ export class EventManager {
     return this;
   }
 
-  // Add Actions to behaviours [By symbols or itself] [optional argument: to a single container or all references]
 };

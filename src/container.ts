@@ -1,5 +1,5 @@
 import { getStringFromSymbol, setSymbol } from './utils';
-import { Behaviour } from './behaviour';
+import { Behaviour } from './behaviour/behaviour';
 import { BehaviourType } from './types';
 import EventEmitter from 'events';
 import { TeardownStrategies } from './types';
@@ -7,22 +7,22 @@ import { TeardownStrategies } from './types';
 class CustomEmitter extends EventEmitter {};
 
 export class Container {
-  private readonly _name : symbol;
+  private readonly _identifier : symbol;
   private emitter : CustomEmitter = new CustomEmitter;
   public behaviours : Map<symbol, Behaviour> = new Map();
   private readonly teardownStrategy : TeardownStrategies;
   // public subCastings : Container[]; //not to be done right now
 
   public get name() : string {
-    return getStringFromSymbol(this._name);
+    return getStringFromSymbol(this._identifier);
   };
 
   public get identifier() : symbol {
-    return this._name;
+    return this._identifier;
   }
 
   public constructor (name : symbol | string, teardownStrategy : TeardownStrategies) {
-    this._name = setSymbol(name);
+    this._identifier = setSymbol(name);
     this.teardownStrategy = teardownStrategy;
   }
 
