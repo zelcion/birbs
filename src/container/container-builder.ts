@@ -1,5 +1,5 @@
-import { setSymbol, throwStrategyInvalid } from '../utils';
-import { TeardownStrategies, VoidableContainerModifier } from '../types';
+import { setSymbol, throwStrategyInvalid } from '../utils/utils';
+import { TeardownStrategies, VoidableContainerModifier } from '../utils/types';
 import { Behaviour } from '../behaviour/behaviour';
 import { Container } from './container';
 

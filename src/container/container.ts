@@ -1,8 +1,8 @@
+import { getIdentifierOf, getStringFromSymbol } from '../utils/utils';
 import { Behaviour } from '../behaviour/behaviour';
-import { BehaviourType } from '../types';
+import { BehaviourType } from '../utils/types';
 import { ContainerBuilder } from './container-builder';
 import { EventEmitter } from 'events';
-import { getStringFromSymbol } from '../utils';
 
 class CustomEmitter extends EventEmitter {};
 
@@ -85,7 +85,7 @@ export class Container extends ContainerBuilder{
     this.teardown();
   }
 
-  public sign(behaviour : Behaviour[] | Behaviour) : void {
+  public sign(behaviour : Behaviour[] | Behaviour) : Container {
     if (Array.isArray(behaviour)) {
       behaviour.forEach((event) => {
         this.signBehaviourByType(event);
@@ -94,19 +94,20 @@ export class Container extends ContainerBuilder{
     }
 
     this.signBehaviourByType(behaviour);
-    return;
+    return this;
   }
 
-  public resign(behaviour : Behaviour[] | Behaviour) : void {
+  public resign(behaviour : Behaviour[] | Behaviour | symbol[] | symbol) : Container {
     if (Array.isArray(behaviour)) {
-      behaviour.forEach((event) => {
-        this.emitter.removeAllListeners(event.identifier);
-        this.behaviours.delete(event.identifier);
+      behaviour.forEach((event : symbol | Behaviour) => {
+        this.emitter.removeAllListeners(getIdentifierOf(event));
+        this.behaviours.delete(getIdentifierOf(event));
       });
       return;
     }
 
-    this.behaviours.delete(behaviour.identifier);
+    this.behaviours.delete(getIdentifierOf(behaviour));
+    return this;
   }
 
   // Add Actions to Behaviours [By Symbol or By itself]

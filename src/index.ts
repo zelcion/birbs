@@ -1,6 +1,6 @@
 import { Behaviour } from './behaviour/behaviour';
 import { Container } from './container/container';
-import { EventManager } from './manager';
+import { EventManager } from './manager/manager';
 
 const birbsModule = {
   Behaviour,

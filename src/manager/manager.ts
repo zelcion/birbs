@@ -1,6 +1,6 @@
-import { Behaviour } from './behaviour/behaviour';
-import { Container } from './container/container';
-import { getIdentifierOf } from './utils';
+import { Behaviour } from '../behaviour/behaviour';
+import { Container } from '../container/container';
+import { getIdentifierOf } from '../utils/utils';
 
 export class EventManager {
   private containers : Map<symbol, Container> = new Map();
@@ -15,8 +15,13 @@ export class EventManager {
     return this;
   }
 
+  public fetchContainer(containerIdentifier : symbol) : Container {
+    return this.containers.get(containerIdentifier);
+  }
+
   public broadcast(behaviour : Behaviour | symbol, container ?: Container | symbol) : EventManager {
-    const chosenContainer = this.containers.get(getIdentifierOf(container));
+    const chosenContainer = (container !== undefined)?
+      this.containers.get(getIdentifierOf(container)) : undefined;
 
     if (chosenContainer === undefined) {
       this.containers.forEach(

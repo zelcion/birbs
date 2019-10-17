@@ -1,5 +1,5 @@
-import { Action, BehaviourType, VoidableBehaviourModifier } from '../types';
-import { setSymbol, throwTypeInvalid } from '../utils';
+import { Action, BehaviourType, VoidableBehaviourModifier } from '../utils/types';
+import { setSymbol, throwTypeInvalid } from '../utils/utils';
 import { Behaviour } from './behaviour';
 
 export class BehaviourBuilder {

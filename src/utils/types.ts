@@ -1,5 +1,5 @@
-import { Behaviour } from './behaviour/behaviour';
-import { Container } from './container/container';
+import { Behaviour } from '../behaviour/behaviour';
+import { Container } from '../container/container';
 
 export type Action = (event : Behaviour) => void | Promise<void>;
 

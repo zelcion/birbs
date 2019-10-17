@@ -1,7 +1,7 @@
 import { Behaviour } from '../src/behaviour/behaviour';
 import { Container } from '../src/container/container';
 import { expect } from 'chai';
-import { TeardownStrategies } from '../src/types';
+import { TeardownStrategies } from '../src/utils/types';
 
 describe.only('container methods', () => {
   const myBehaviourIdentifier = Symbol('behaviourID');
@@ -59,5 +59,32 @@ describe.only('container methods', () => {
     expect(container.behaviours.has(myBehaviourIdentifier)).to.be.false;
     expect(wasExecuted).to.be.true;
     expect(container.behaviours.has(anotherBehaviourId)).to.be.true;
+  });
+
+  it('container adding and removing Behaviours works', () => {
+    const containerIdentifier = Symbol('MyContainerId');
+    const conainerStrategy : TeardownStrategies = 'once';
+    const anotherBehaviourId = Symbol('anotherId');
+
+    const anotherBehaviour = new Behaviour()
+      .withIdentifier(anotherBehaviourId)
+      .withType('always')
+      .withAction(() => {console.log(true);})
+      .build();
+
+    const container = new Container()
+      .withStrategy(conainerStrategy)
+      .withIdentifier(containerIdentifier)
+      .withBehaviours([devBehaviour])
+      .build();
+
+    expect(container.behaviours.has(myBehaviourIdentifier)).to.be.true;
+    expect(container.behaviours.has(anotherBehaviourId)).to.be.false;
+
+    container.resign(myBehaviourIdentifier).sign(anotherBehaviour);
+
+    expect(container.behaviours.has(myBehaviourIdentifier)).to.be.false;
+    expect(container.behaviours.has(anotherBehaviourId)).to.be.true;
+
   });
 });
