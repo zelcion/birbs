@@ -1,18 +1,14 @@
-import { getStringFromSymbol, setSymbol } from './utils';
-import { Behaviour } from './behaviour/behaviour';
-import { BehaviourType } from './types';
-import EventEmitter from 'events';
-import { TeardownStrategies } from './types';
+import { Behaviour } from '../behaviour/behaviour';
+import { BehaviourType } from '../types';
+import { ContainerBuilder } from './container-builder';
+import { EventEmitter } from 'events';
+import { getStringFromSymbol } from '../utils';
 
 class CustomEmitter extends EventEmitter {};
 
-export class Container {
-  private readonly _identifier : symbol;
+export class Container extends ContainerBuilder{
+  // class -------------------------
   private emitter : CustomEmitter = new CustomEmitter;
-  public behaviours : Map<symbol, Behaviour> = new Map();
-  private readonly teardownStrategy : TeardownStrategies;
-  // public subCastings : Container[]; //not to be done right now
-
   public get name() : string {
     return getStringFromSymbol(this._identifier);
   };
@@ -21,9 +17,10 @@ export class Container {
     return this._identifier;
   }
 
-  public constructor (name : symbol | string, teardownStrategy : TeardownStrategies) {
-    this._identifier = setSymbol(name);
-    this.teardownStrategy = teardownStrategy;
+  public getEmitter(identifier : symbol) : CustomEmitter {
+    if (identifier === this.identifier) {
+      return this.emitter;
+    }
   }
 
   public publish(behaviour : Behaviour | symbol) : void {
@@ -72,31 +69,31 @@ export class Container {
     return list;
   }
 
-  public flush() : void {
-    this.teardown();
-  }
-
-  private signBehaviourByType(behaviour : Behaviour) : void {
+  public signBehaviourByType(behaviour : Behaviour) : void {
     if (behaviour.type === 'always') {
       this.emitter.on(behaviour.identifier, behaviour.Act);
+      this.behaviours.set(behaviour.identifier, behaviour);
       return;
     }
 
     this.emitter.once(behaviour.identifier, behaviour.Act);
+    this.behaviours.set(behaviour.identifier, behaviour);
     return;
+  }
+
+  public flush() : void {
+    this.teardown();
   }
 
   public sign(behaviour : Behaviour[] | Behaviour) : void {
     if (Array.isArray(behaviour)) {
       behaviour.forEach((event) => {
         this.signBehaviourByType(event);
-        this.behaviours.set(event.identifier, event);
       });
       return;
     }
 
     this.signBehaviourByType(behaviour);
-    this.behaviours.set(behaviour.identifier, behaviour);
     return;
   }
 

@@ -1,4 +1,4 @@
-import { BehaviourType, Identifiable } from './types';
+import { BehaviourType, Identifiable, TeardownStrategies } from './types';
 
 export const setSymbol = (entry : symbol | string) : symbol => {
   let result : symbol;
@@ -24,5 +24,11 @@ export const getIdentifierOf = (identity : Identifiable | symbol) : symbol => {
 export const throwTypeInvalid = (type : BehaviourType) : void => {
   if(type !== 'once' && type !== 'always') {
     throw new Error('Unrecognized type in builder! Type must be either "once" or "always"!');
+  }
+};
+
+export const throwStrategyInvalid = (type : TeardownStrategies) : void => {
+  if(type !== 'once' && type !== 'all' && type !== 'none') {
+    throw new Error('Unrecognized type in builder! Type must be "once", or "all", or "none"!');
   }
 };

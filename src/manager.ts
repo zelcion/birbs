@@ -1,5 +1,5 @@
 import { Behaviour } from './behaviour/behaviour';
-import { Container } from './container';
+import { Container } from './container/container';
 import { getIdentifierOf } from './utils';
 
 export class EventManager {
