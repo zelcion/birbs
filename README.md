@@ -1,8 +1,11 @@
-# Birbs
+[![Build Status](https://travis-ci.org/flgmjr/birbs.svg?branch=master)](https://travis-ci.org/flgmjr/birbs)
+# Birbs 
 Capture and admire all your joyful events with this event manager and encapsulator!
 
 --------------------
 #### A Quick Heads'up
+
+> Readme is under construction - It is incomplete and have some wrong info. It's highly advisable for you to wait until version 0.5 to use this package.
 
 > We will soon update to version `0.5`, which will be the first production-ready package!
 > There are still some things on the roadmap which will greatly increase Birbs' functionality. When those are implemented we will be moving to our `1.x.x` packages.
