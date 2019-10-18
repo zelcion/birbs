@@ -1,6 +1,6 @@
 {
   "name": "birbs",
-  "version": "0.3.0",
+  "version": "0.2.90",
   "description": "Capture and admire all your joyful events with this event manager and encapsulator!",
   "main": "./lib/index.js",
   "types": "./lib/index.d.ts",
@@ -29,7 +29,7 @@
     "birb"
   ],
   "author": "flgmjr",
-  "license": "ISC",
+  "license": "GPL-3.0",
   "bugs": {
     "url": "https://github.com/flgmjr/birbs/issues"
   },
