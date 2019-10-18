@@ -48,17 +48,17 @@ describe.only('container methods', () => {
       .withBehaviours([devBehaviour, anotherBehaviour])
       .build();
 
-    expect(container.behaviours.has(myBehaviourIdentifier)).to.be.true;
+    expect(container.hasBehaviour(myBehaviourIdentifier)).to.be.true;
 
     container.publish(myBehaviourIdentifier);
-    expect(container.behaviours.has(myBehaviourIdentifier)).to.be.false;
+    expect(container.hasBehaviour(myBehaviourIdentifier)).to.be.false;
     expect(wasExecuted).to.be.false;
-    expect(container.behaviours.has(anotherBehaviourId)).to.be.true;
+    expect(container.hasBehaviour(anotherBehaviourId)).to.be.true;
 
     container.publish(anotherBehaviourId);
-    expect(container.behaviours.has(myBehaviourIdentifier)).to.be.false;
+    expect(container.hasBehaviour(myBehaviourIdentifier)).to.be.false;
     expect(wasExecuted).to.be.true;
-    expect(container.behaviours.has(anotherBehaviourId)).to.be.true;
+    expect(container.hasBehaviour(anotherBehaviourId)).to.be.true;
   });
 
   it('container adding and removing Behaviours works', () => {
@@ -78,13 +78,13 @@ describe.only('container methods', () => {
       .withBehaviours([devBehaviour])
       .build();
 
-    expect(container.behaviours.has(myBehaviourIdentifier)).to.be.true;
-    expect(container.behaviours.has(anotherBehaviourId)).to.be.false;
+    expect(container.hasBehaviour(myBehaviourIdentifier)).to.be.true;
+    expect(container.hasBehaviour(anotherBehaviourId)).to.be.false;
 
     container.resign(myBehaviourIdentifier).sign(anotherBehaviour);
 
-    expect(container.behaviours.has(myBehaviourIdentifier)).to.be.false;
-    expect(container.behaviours.has(anotherBehaviourId)).to.be.true;
+    expect(container.hasBehaviour(myBehaviourIdentifier)).to.be.false;
+    expect(container.hasBehaviour(anotherBehaviourId)).to.be.true;
 
   });
 });

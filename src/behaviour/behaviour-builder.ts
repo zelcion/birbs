@@ -5,8 +5,8 @@ import { Behaviour } from './behaviour';
 export class BehaviourBuilder {
   private _modifiers : Array<VoidableBehaviourModifier> = [];
   protected _identifier : symbol;
-  public type : BehaviourType;
-  protected actions : Map<symbol, Action> = new Map();
+  protected _type : BehaviourType;
+  protected _actions : Map<symbol, Action> = new Map();
 
   public build <T extends Behaviour>(extended ?: new() => T) : T {
     const result = (extended)? new extended() : new Behaviour();
@@ -35,7 +35,7 @@ export class BehaviourBuilder {
     throwTypeInvalid(type);
 
     this._newModifier((behaviour : Behaviour) : void => {
-      behaviour.type = type;
+      behaviour._type = type;
     });
 
     return this;
@@ -45,7 +45,7 @@ export class BehaviourBuilder {
     this._newModifier((behaviour : Behaviour) : void => {
       const actionKey : symbol = setSymbol('unchangeable');
 
-      behaviour.actions.set(actionKey, action);
+      behaviour._actions.set(actionKey, action);
     });
 
     return this;

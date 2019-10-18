@@ -50,11 +50,11 @@ describe.only('container methods', () => {
     defaultManager.addContainer(defaultContainer);
     defaultManager.listen(anotherBehaviour, containerIdentifier);
 
-    expect(defaultContainer.behaviours.get(myBehaviourIdentifier)).to.be.deep.equal(devBehaviour);
+    expect(defaultContainer.getBehaviour(myBehaviourIdentifier)).to.be.deep.equal(devBehaviour);
 
     defaultManager.broadcast(anotherBehaviourId);
 
-    expect(defaultContainer.behaviours.has(myBehaviourIdentifier)).to.be.false;
+    expect(defaultContainer.getBehaviour(myBehaviourIdentifier)).to.be.undefined;
     expect(defaultManager.fetchContainer(containerIdentifier)).to.be.deep.equal(defaultContainer);
 
     defaultManager.removeContainer(containerIdentifier);

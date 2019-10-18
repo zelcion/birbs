@@ -7,8 +7,8 @@ import { EventEmitter } from 'events';
 class CustomEmitter extends EventEmitter {};
 
 export class Container extends ContainerBuilder{
-  // class -------------------------
-  private emitter : CustomEmitter = new CustomEmitter;
+  private _emitter : CustomEmitter = new CustomEmitter;
+
   public get name() : string {
     return getStringFromSymbol(this._identifier);
   };
@@ -19,50 +19,50 @@ export class Container extends ContainerBuilder{
 
   public getEmitter(identifier : symbol) : CustomEmitter {
     if (identifier === this.identifier) {
-      return this.emitter;
+      return this._emitter;
     }
   }
 
   public publish(behaviour : Behaviour | symbol) : void {
     const behaviourToBeEmitted : Behaviour = (typeof behaviour === 'symbol')?
-      this.behaviours.get(behaviour) :
+      this._behaviours.get(behaviour) :
       behaviour;
 
-    this.emitter.emit(behaviourToBeEmitted.identifier, behaviourToBeEmitted);
+    this._emitter.emit(behaviourToBeEmitted.identifier, behaviourToBeEmitted);
 
-    this.teardown();
+    this._teardown();
   }
 
-  private teardown() : void {
-    if (this.teardownStrategy === 'none') {
+  private _teardown() : void {
+    if (this._teardownStrategy === 'none') {
       return;
     }
 
-    if (this.teardownStrategy === 'all') {
-      this.behaviours.forEach((behaviour) => {
-        this.emitter.removeAllListeners(behaviour.identifier);
+    if (this._teardownStrategy === 'all') {
+      this._behaviours.forEach((behaviour) => {
+        this._emitter.removeAllListeners(behaviour.identifier);
       });
 
-      this.behaviours = new Map();
+      this._behaviours = new Map();
       return;
     }
 
-    this.filterOnceBehaviours();
+    this._filterOnceBehaviours();
   }
 
-  private filterOnceBehaviours() : void {
-    this.behaviours.forEach((behaviour) => {
-      if (behaviour.type === 'once') this.emitter.removeAllListeners(behaviour.identifier);
+  private _filterOnceBehaviours() : void {
+    this._behaviours.forEach((behaviour) => {
+      if (behaviour.type === 'once') this._emitter.removeAllListeners(behaviour.identifier);
     });
 
-    this.getBehaviourListByType('once').forEach((behaviour) => {
-      this.behaviours.delete(behaviour.identifier);
+    this._getBehaviourListByType('once').forEach((behaviour) => {
+      this._behaviours.delete(behaviour.identifier);
     });
   }
 
-  private getBehaviourListByType(type : BehaviourType) : Behaviour[] {
+  private _getBehaviourListByType(type : BehaviourType) : Behaviour[] {
     const list : Behaviour[] = [];
-    this.behaviours.forEach((behaviour) => {
+    this._behaviours.forEach((behaviour) => {
       if (behaviour.type === type) list.push(behaviour);
     });
 
@@ -71,18 +71,18 @@ export class Container extends ContainerBuilder{
 
   public signBehaviourByType(behaviour : Behaviour) : void {
     if (behaviour.type === 'always') {
-      this.emitter.on(behaviour.identifier, behaviour.Act);
-      this.behaviours.set(behaviour.identifier, behaviour);
+      this._emitter.on(behaviour.identifier, behaviour.Act);
+      this._behaviours.set(behaviour.identifier, behaviour);
       return;
     }
 
-    this.emitter.once(behaviour.identifier, behaviour.Act);
-    this.behaviours.set(behaviour.identifier, behaviour);
+    this._emitter.once(behaviour.identifier, behaviour.Act);
+    this._behaviours.set(behaviour.identifier, behaviour);
     return;
   }
 
   public flush() : void {
-    this.teardown();
+    this._teardown();
   }
 
   public sign(behaviour : Behaviour[] | Behaviour) : Container {
@@ -100,14 +100,22 @@ export class Container extends ContainerBuilder{
   public resign(behaviour : Behaviour[] | Behaviour | symbol[] | symbol) : Container {
     if (Array.isArray(behaviour)) {
       behaviour.forEach((event : symbol | Behaviour) => {
-        this.emitter.removeAllListeners(getIdentifierOf(event));
-        this.behaviours.delete(getIdentifierOf(event));
+        this._emitter.removeAllListeners(getIdentifierOf(event));
+        this._behaviours.delete(getIdentifierOf(event));
       });
       return;
     }
 
-    this.behaviours.delete(getIdentifierOf(behaviour));
+    this._behaviours.delete(getIdentifierOf(behaviour));
     return this;
+  }
+
+  public getBehaviour(behaviourId : symbol) : Behaviour | undefined{
+    return this._behaviours.get(behaviourId);
+  }
+
+  public hasBehaviour(behaviour : symbol | Behaviour) : boolean {
+    return this._behaviours.has(getIdentifierOf(behaviour));
   }
 
   // Add Actions to Behaviours [By Symbol or By itself]

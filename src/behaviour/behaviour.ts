@@ -1,8 +1,13 @@
 import { BehaviourBuilder } from './behaviour-builder';
+import { BehaviourType } from '../utils/types';
 
 export class Behaviour extends BehaviourBuilder{
   public get identifier() : symbol {
     return this._identifier;
+  }
+
+  public get type() : BehaviourType {
+    return this._type;
   }
 
   public constructor () {
@@ -12,7 +17,7 @@ export class Behaviour extends BehaviourBuilder{
 
   public async Act() : Promise<void> {
     const executionCompletion = [];
-    this.actions.forEach((action) => {
+    this._actions.forEach((action) => {
       executionCompletion.push(action(this));
     });
 

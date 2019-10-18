@@ -4,11 +4,10 @@ import { Behaviour } from '../behaviour/behaviour';
 import { Container } from './container';
 
 export class ContainerBuilder {
-  // builder ----------------------
   private _modifiers : VoidableContainerModifier[] = [];
   protected _identifier : symbol;
-  public behaviours : Map<symbol, Behaviour> = new Map();
-  protected  teardownStrategy : TeardownStrategies;
+  protected _behaviours : Map<symbol, Behaviour> = new Map();
+  protected _teardownStrategy : TeardownStrategies;
 
   public build() : Container {
     return this._instantiate(new Container());
@@ -36,7 +35,7 @@ export class ContainerBuilder {
     throwStrategyInvalid(teardownStrategy);
 
     this._newModifier((container : Container) : void => {
-      container.teardownStrategy = teardownStrategy;
+      container._teardownStrategy = teardownStrategy;
     });
 
     return this;
