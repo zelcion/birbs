@@ -1,1 +1,13 @@
 language: node_js
+node_js:
+  - 8
+  - 10
+  - 11
+  - 12
+jobs:
+  include:
+    - name: "Unit test"
+      script: npm test
+    - name: "Compiling"
+      script: npm run compile
+    
