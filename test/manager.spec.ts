@@ -4,7 +4,7 @@ import { EventManager } from '../src/manager/manager';
 import { expect } from 'chai';
 import { TeardownStrategies } from '../src/utils/types';
 
-describe.only('container methods', () => {
+describe('Manager methods', () => {
   const myBehaviourIdentifier = Symbol('behaviourID');
   const myBehaviourType = 'once';
   const containerIdentifier = Symbol('MyContainerId');

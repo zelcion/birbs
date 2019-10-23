@@ -1,7 +1,7 @@
 import { Behaviour } from '../src/behaviour/behaviour';
 import { expect } from 'chai';
 
-describe.only('container methods', () => {
+describe('Behaviour methods', () => {
   it('Behaviour Builder works' ,() => {
     const myIdentifier = Symbol('behaviourID');
     const myType = 'once';
@@ -31,7 +31,7 @@ describe.only('container methods', () => {
       .withIdentifier(myIdentifier)
       .withType(myType)
       .withAction(customAction)
-      .build(CustomImplementation);
+      .build();
 
     dev.Act();
     expect(dev.isTropical).to.be.equal(true);

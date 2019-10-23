@@ -3,7 +3,7 @@ import { Container } from '../src/container/container';
 import { expect } from 'chai';
 import { TeardownStrategies } from '../src/utils/types';
 
-describe.only('container methods', () => {
+describe('container methods', () => {
   const myBehaviourIdentifier = Symbol('behaviourID');
   const myBehaviourType = 'once';
   let devBehaviour : Behaviour;

@@ -8,41 +8,35 @@ export class BehaviourBuilder {
   protected _type : BehaviourType;
   protected _actions : Map<symbol, Action> = new Map();
 
-  public build <T extends Behaviour>(extended ?: new() => T) : T {
-    const result = (extended)? new extended() : new Behaviour();
-    return this._instantiate(result) as T;
-  };
-
-  private _instantiate (thisClass : Behaviour) : Behaviour {
-    const result = thisClass;
+  public build <T extends Behaviour>(this : T) : T{
     this._modifiers.forEach((modifier) => {
-      modifier(result);
+      modifier(this);
     });
 
     this._modifiers = [];
-    return result;
-  }
+    return this;
+  };
 
-  public withIdentifier(identifier : symbol | string) : BehaviourBuilder {
-    this._newModifier((behaviour : Behaviour) : void => {
+  public withIdentifier <T extends Behaviour>(this : T, identifier : symbol | string) : T {
+    this._newModifier((behaviour : T) : void => {
       behaviour._identifier = setSymbol(identifier);
     });
 
     return this;
   }
 
-  public withType(type : BehaviourType) : BehaviourBuilder {
+  public withType <T extends Behaviour>(this : T, type : BehaviourType) : T {
     throwTypeInvalid(type);
 
-    this._newModifier((behaviour : Behaviour) : void => {
+    this._newModifier((behaviour : T) : void => {
       behaviour._type = type;
     });
 
     return this;
   }
 
-  public withAction(action : Action) : BehaviourBuilder {
-    this._newModifier((behaviour : Behaviour) : void => {
+  public withAction <T extends Behaviour>(this : T, action : Action) : T {
+    this._newModifier((behaviour : T) : void => {
       const actionKey : symbol = setSymbol('unchangeable');
 
       behaviour._actions.set(actionKey, action);
