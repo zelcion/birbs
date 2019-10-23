@@ -21,16 +21,28 @@ describe('Behaviour methods', () => {
 
     class CustomImplementation extends Behaviour {
       public isTropical = false;
+      public niibs : string;
+
+      public constructor(niibs : string) {
+        super();
+        this.niibs = niibs;
+      }
+
+      public loggy () : void {
+        console.log('ya hoooo');
+      }
     }
 
     const customAction = (ev : CustomImplementation) : void  => {
       ev.isTropical = true;
+      console.log(ev);
     };
 
-    const dev = new CustomImplementation()
+    const dev = new CustomImplementation('halal')
       .withIdentifier(myIdentifier)
       .withType(myType)
       .withAction(customAction)
+      .withOwnMethodAsAction('loggy')
       .build();
 
     dev.Act();

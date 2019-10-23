@@ -45,6 +45,21 @@ export class BehaviourBuilder {
     return this;
   }
 
+  // @TODO: FIND BETTER IMPLEMENTATION INSTEAD OF STRING
+  public withOwnMethodAsAction <T extends Behaviour>(this : T, action : string) : T {
+    this._newModifier((behaviour : T) : void => {
+      const actionKey : symbol = setSymbol('unchangeable');
+
+      if (typeof behaviour[action] !== 'function') {
+        throw new Error('Action must be a name of a method of your Behaviour');
+      }
+
+      behaviour._actions.set(actionKey, behaviour[action]);
+    });
+
+    return this;
+  }
+
   private _newModifier(modification : VoidableBehaviourModifier) : void {
     this._modifiers.push(modification);
   }
