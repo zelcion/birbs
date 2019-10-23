@@ -29,13 +29,12 @@ describe('Behaviour methods', () => {
       }
 
       public loggy () : void {
-        console.log('ya hoooo');
+        console.log(this.niibs);
       }
     }
 
     const customAction = (ev : CustomImplementation) : void  => {
       ev.isTropical = true;
-      console.log(ev);
     };
 
     const dev = new CustomImplementation('halal')

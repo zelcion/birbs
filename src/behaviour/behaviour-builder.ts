@@ -54,6 +54,7 @@ export class BehaviourBuilder {
         throw new Error('Action must be a name of a method of your Behaviour');
       }
 
+      behaviour[action] = behaviour[action].bind(behaviour);
       behaviour._actions.set(actionKey, behaviour[action]);
     });
 
