@@ -1,12 +1,12 @@
 import { setSymbol, throwStrategyInvalid } from '../utils/utils';
 import { TeardownStrategies, VoidableContainerModifier } from '../utils/types';
-import { Behaviour } from '../behaviour/behaviour';
 import { Context } from './context';
+import { Procedure } from '../procedure/procedure';
 
 export class ContextBuilder {
   private _modifiers : VoidableContainerModifier[] = [];
   protected _identifier : symbol;
-  protected _behaviours : Map<symbol, Behaviour> = new Map();
+  protected _procedures : Map<symbol, Procedure> = new Map();
   protected _teardownStrategy : TeardownStrategies;
 
   public build<T extends Context>(this : T) : T {
@@ -36,9 +36,9 @@ export class ContextBuilder {
     return this;
   }
 
-  public withBehaviours<T extends Context>(this : T, behaviours : Behaviour | Behaviour[]) : T {
+  public withProcedures<T extends Context>(this : T, procedures : Procedure | Procedure[]) : T {
     this._newModifier((container : Context) : void => {
-      container.sign(behaviours);
+      container.sign(procedures);
     });
 
     return this;

@@ -1,8 +1,8 @@
 import { getIdentifierOf, getStringFromSymbol } from '../utils/utils';
-import { Behaviour } from '../behaviour/behaviour';
-import { BehaviourType } from '../utils/types';
 import { ContextBuilder } from './context-builder';
 import { EventEmitter } from 'events';
+import { Procedure } from '../procedure/procedure';
+import { ProcedureType } from '../utils/types';
 
 class CustomEmitter extends EventEmitter {};
 
@@ -23,12 +23,12 @@ export class Context extends ContextBuilder{
     }
   }
 
-  public publish(behaviour : Behaviour | symbol) : void {
-    const behaviourToBeEmitted : Behaviour = (typeof behaviour === 'symbol')?
-      this._behaviours.get(behaviour) :
-      behaviour;
+  public publish(procedure : Procedure | symbol) : void {
+    const procedureToBeEmitted : Procedure = (typeof procedure === 'symbol')?
+      this._procedures.get(procedure) :
+      procedure;
 
-    this._emitter.emit(behaviourToBeEmitted.identifier, behaviourToBeEmitted);
+    this._emitter.emit(procedureToBeEmitted.identifier, procedureToBeEmitted);
 
     this._teardown();
   }
@@ -39,47 +39,47 @@ export class Context extends ContextBuilder{
     }
 
     if (this._teardownStrategy === 'all') {
-      this._behaviours.forEach((behaviour) => {
-        this._emitter.removeAllListeners(behaviour.identifier);
+      this._procedures.forEach((procedure) => {
+        this._emitter.removeAllListeners(procedure.identifier);
       });
 
-      this._behaviours = new Map();
+      this._procedures = new Map();
       return;
     }
 
-    this._filterOnceBehaviours();
+    this._filterOnceProcedures();
   }
 
-  private _filterOnceBehaviours() : void {
-    this._behaviours.forEach((behaviour) => {
-      if (behaviour.type === 'once') this._emitter.removeAllListeners(behaviour.identifier);
+  private _filterOnceProcedures() : void {
+    this._procedures.forEach((procedure) => {
+      if (procedure.type === 'once') this._emitter.removeAllListeners(procedure.identifier);
     });
 
-    this._getBehaviourListByType('once').forEach((behaviour) => {
-      this._behaviours.delete(behaviour.identifier);
+    this._getProcedureListByType('once').forEach((procedure) => {
+      this._procedures.delete(procedure.identifier);
     });
   }
 
-  private _getBehaviourListByType(type : BehaviourType) : Behaviour[] {
-    const list : Behaviour[] = [];
-    this._behaviours.forEach((behaviour) => {
-      if (behaviour.type === type) list.push(behaviour);
+  private _getProcedureListByType(type : ProcedureType) : Procedure[] {
+    const list : Procedure[] = [];
+    this._procedures.forEach((procedure) => {
+      if (procedure.type === type) list.push(procedure);
     });
 
     return list;
   }
 
-  public signBehaviourByType(behaviour : Behaviour) : void {
-    behaviour.setContext(this);
+  public signProcedureByType(procedure : Procedure) : void {
+    procedure.setContext(this);
 
-    if (behaviour.type === 'always') {
-      this._emitter.on(behaviour.identifier, behaviour.Act);
-      this._behaviours.set(behaviour.identifier, behaviour);
+    if (procedure.type === 'always') {
+      this._emitter.on(procedure.identifier, procedure.Act);
+      this._procedures.set(procedure.identifier, procedure);
       return;
     }
 
-    this._emitter.once(behaviour.identifier, behaviour.Act);
-    this._behaviours.set(behaviour.identifier, behaviour);
+    this._emitter.once(procedure.identifier, procedure.Act);
+    this._procedures.set(procedure.identifier, procedure);
     return;
   }
 
@@ -87,38 +87,38 @@ export class Context extends ContextBuilder{
     this._teardown();
   }
 
-  public sign(behaviour : Behaviour[] | Behaviour) : Context {
-    if (Array.isArray(behaviour)) {
-      behaviour.forEach((event) => {
-        this.signBehaviourByType(event);
+  public sign(procedure : Procedure[] | Procedure) : Context {
+    if (Array.isArray(procedure)) {
+      procedure.forEach((event) => {
+        this.signProcedureByType(event);
       });
       return;
     }
 
-    this.signBehaviourByType(behaviour);
+    this.signProcedureByType(procedure);
     return this;
   }
 
-  public resign(behaviour : Behaviour[] | Behaviour | symbol[] | symbol) : Context {
-    if (Array.isArray(behaviour)) {
-      behaviour.forEach((event : symbol | Behaviour) => {
+  public resign(procedure : Procedure[] | Procedure | symbol[] | symbol) : Context {
+    if (Array.isArray(procedure)) {
+      procedure.forEach((event : symbol | Procedure) => {
         this._emitter.removeAllListeners(getIdentifierOf(event));
-        this._behaviours.delete(getIdentifierOf(event));
+        this._procedures.delete(getIdentifierOf(event));
       });
       return;
     }
 
-    this._behaviours.delete(getIdentifierOf(behaviour));
+    this._procedures.delete(getIdentifierOf(procedure));
     return this;
   }
 
-  public getBehaviour(behaviourId : symbol) : Behaviour | undefined{
-    return this._behaviours.get(behaviourId);
+  public getProcedure(procedureId : symbol) : Procedure | undefined{
+    return this._procedures.get(procedureId);
   }
 
-  public hasBehaviour(behaviour : symbol | Behaviour) : boolean {
-    return this._behaviours.has(getIdentifierOf(behaviour));
+  public hasProcedure(procedure : symbol | Procedure) : boolean {
+    return this._procedures.has(getIdentifierOf(procedure));
   }
 
-  // Add Actions to Behaviours [By Symbol or By itself]
+  // Add Actions to Procedures [By Symbol or By itself]
 };

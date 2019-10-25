@@ -1,13 +1,13 @@
-import { Behaviour } from '../src/behaviour/behaviour';
 import { Context } from '../src/context/context';
 import { expect } from 'chai';
+import { Procedure } from '../src/procedure/procedure';
 
-describe('Behaviour methods', () => {
-  it('Behaviour Builder works' ,() => {
+describe('Procedure methods', () => {
+  it('Procedure Builder works' ,() => {
     const myIdentifier = Symbol('behaviourID');
     const myType = 'once';
 
-    const dev = new Behaviour()
+    const dev = new Procedure()
       .withIdentifier(myIdentifier)
       .withType(myType)
       .build();
@@ -16,11 +16,11 @@ describe('Behaviour methods', () => {
     expect(dev.type).to.be.equal(myType);
   });
 
-  it('Behaviour extension and Actions works', () => {
+  it('Procedure extension and Actions works', () => {
     const myIdentifier = Symbol('behaviourID');
     const myType = 'once';
 
-    class CustomImplementation extends Behaviour {
+    class CustomImplementation extends Procedure {
       public isTropical = false;
       public randomString : string;
 

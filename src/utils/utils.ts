@@ -1,4 +1,4 @@
-import { BehaviourType, Identifiable, TeardownStrategies } from './types';
+import { Identifiable, ProcedureType, TeardownStrategies } from './types';
 
 export const setSymbol = (entry : symbol | string) : symbol => {
   let result : symbol;
@@ -21,7 +21,7 @@ export const getIdentifierOf = (identity : Identifiable | symbol) : symbol => {
   return identity.identifier;
 };
 
-export const throwTypeInvalid = (type : BehaviourType) : void => {
+export const throwTypeInvalid = (type : ProcedureType) : void => {
   if(type !== 'once' && type !== 'always') {
     throw new Error('Unrecognized type in builder! Type must be either "once" or "always"!');
   }

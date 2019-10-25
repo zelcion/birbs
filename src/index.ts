@@ -1,11 +1,11 @@
-import { Behaviour } from './behaviour/behaviour';
 import { Context } from './context/context';
 import { EventManager } from './manager/manager';
+import { Procedure } from './procedure/procedure';
 
 const birbsModule = {
-  Behaviour,
   Context,
   EventManager,
+  Procedure,
 };
 
 module.exports = birbsModule;

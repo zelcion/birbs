@@ -1,20 +1,20 @@
-import { Behaviour } from '../src/behaviour/behaviour';
 import { Context } from '../src/context/context';
 import { expect } from 'chai';
+import { Procedure } from '../src/procedure/procedure';
 import { TeardownStrategies } from '../src/utils/types';
 
 describe('container methods', () => {
-  const myBehaviourIdentifier = Symbol('behaviourID');
-  const myBehaviourType = 'once';
-  let devBehaviour : Behaviour;
+  const myProcedureIdentifier = Symbol('behaviourID');
+  const myProcedureType = 'once';
+  let devProcedure : Procedure;
   beforeEach(() => {
-    const logFunction = (ev : Behaviour) : void=> {
-      console.log(`Behaviour with identifier of ${String(ev.identifier)} has acted!`);
+    const logFunction = (ev : Procedure) : void=> {
+      console.log(`Procedure with identifier of ${String(ev.identifier)} has acted!`);
     };
 
-    devBehaviour = new Behaviour()
-      .withIdentifier(myBehaviourIdentifier)
-      .withType(myBehaviourType)
+    devProcedure = new Procedure()
+      .withIdentifier(myProcedureIdentifier)
+      .withType(myProcedureType)
       .withAction(logFunction)
       .build();
   });
@@ -25,7 +25,7 @@ describe('container methods', () => {
     const container = new Context()
       .withStrategy(conainerStrategy)
       .withIdentifier(containerIdentifier)
-      .withBehaviours(devBehaviour)
+      .withProcedures(devProcedure)
       .build();
 
     expect(container.identifier).to.be.equal(containerIdentifier);
@@ -35,11 +35,11 @@ describe('container methods', () => {
     const containerIdentifier = Symbol('MyContainerId');
     const conainerStrategy : TeardownStrategies = 'once';
     let wasExecuted = false;
-    const anotherBehaviourId = Symbol('anotherId');
-    const anotherBehaviour = new Behaviour()
-      .withIdentifier(anotherBehaviourId)
+    const anotherProcedureId = Symbol('anotherId');
+    const anotherProcedure = new Procedure()
+      .withIdentifier(anotherProcedureId)
       .withType('always')
-      .withAction((ev : Behaviour, context : Context) => {
+      .withAction((ev : Procedure, context : Context) => {
         wasExecuted = true;
         console.log(context, ev);
       })
@@ -48,29 +48,29 @@ describe('container methods', () => {
     const container = new Context()
       .withStrategy(conainerStrategy)
       .withIdentifier(containerIdentifier)
-      .withBehaviours([devBehaviour, anotherBehaviour])
+      .withProcedures([devProcedure, anotherProcedure])
       .build();
 
-    expect(container.hasBehaviour(myBehaviourIdentifier)).to.be.true;
+    expect(container.hasProcedure(myProcedureIdentifier)).to.be.true;
 
-    container.publish(myBehaviourIdentifier);
-    expect(container.hasBehaviour(myBehaviourIdentifier)).to.be.false;
+    container.publish(myProcedureIdentifier);
+    expect(container.hasProcedure(myProcedureIdentifier)).to.be.false;
     expect(wasExecuted).to.be.false;
-    expect(container.hasBehaviour(anotherBehaviourId)).to.be.true;
+    expect(container.hasProcedure(anotherProcedureId)).to.be.true;
 
-    container.publish(anotherBehaviourId);
-    expect(container.hasBehaviour(myBehaviourIdentifier)).to.be.false;
+    container.publish(anotherProcedureId);
+    expect(container.hasProcedure(myProcedureIdentifier)).to.be.false;
     expect(wasExecuted).to.be.true;
-    expect(container.hasBehaviour(anotherBehaviourId)).to.be.true;
+    expect(container.hasProcedure(anotherProcedureId)).to.be.true;
   });
 
-  it('container adding and removing Behaviours works', () => {
+  it('container adding and removing Procedures works', () => {
     const containerIdentifier = Symbol('MyContainerId');
     const conainerStrategy : TeardownStrategies = 'once';
-    const anotherBehaviourId = Symbol('anotherId');
+    const anotherProcedureId = Symbol('anotherId');
 
-    const anotherBehaviour = new Behaviour()
-      .withIdentifier(anotherBehaviourId)
+    const anotherProcedure = new Procedure()
+      .withIdentifier(anotherProcedureId)
       .withType('always')
       .withAction(() => {console.log(true);})
       .build();
@@ -78,16 +78,16 @@ describe('container methods', () => {
     const container = new Context()
       .withStrategy(conainerStrategy)
       .withIdentifier(containerIdentifier)
-      .withBehaviours([devBehaviour])
+      .withProcedures([devProcedure])
       .build();
 
-    expect(container.hasBehaviour(myBehaviourIdentifier)).to.be.true;
-    expect(container.hasBehaviour(anotherBehaviourId)).to.be.false;
+    expect(container.hasProcedure(myProcedureIdentifier)).to.be.true;
+    expect(container.hasProcedure(anotherProcedureId)).to.be.false;
 
-    container.resign(myBehaviourIdentifier).sign(anotherBehaviour);
+    container.resign(myProcedureIdentifier).sign(anotherProcedure);
 
-    expect(container.hasBehaviour(myBehaviourIdentifier)).to.be.false;
-    expect(container.hasBehaviour(anotherBehaviourId)).to.be.true;
+    expect(container.hasProcedure(myProcedureIdentifier)).to.be.false;
+    expect(container.hasProcedure(anotherProcedureId)).to.be.true;
 
   });
 });

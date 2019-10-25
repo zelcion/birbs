@@ -1,6 +1,6 @@
-import { Behaviour } from '../behaviour/behaviour';
 import { Context } from '../context/context';
 import { getIdentifierOf } from '../utils/utils';
+import { Procedure } from '../procedure/procedure';
 
 export class EventManager {
   private containers : Map<symbol, Context> = new Map();
@@ -19,29 +19,29 @@ export class EventManager {
     return this.containers.get(containerIdentifier);
   }
 
-  public broadcast(behaviour : Behaviour | symbol, container ?: Context | symbol) : EventManager {
+  public broadcast(procedure : Procedure | symbol, container ?: Context | symbol) : EventManager {
     const chosenContainer = (container !== undefined)?
       this.containers.get(getIdentifierOf(container)) : undefined;
 
     if (chosenContainer === undefined) {
       this.containers.forEach(
-        (context) => context.publish(behaviour)
+        (context) => context.publish(procedure)
       );
 
       return this;
     }
 
-    chosenContainer.publish(behaviour);
+    chosenContainer.publish(procedure);
     return this;
   }
 
-  public listen(behaviour : Behaviour, container : Context | symbol) : EventManager {
-    this.containers.get(getIdentifierOf(container)).sign(behaviour);
+  public listen(procedure : Procedure, container : Context | symbol) : EventManager {
+    this.containers.get(getIdentifierOf(container)).sign(procedure);
     return this;
   }
 
-  public removeListener(behaviour : Behaviour, container : Context | symbol) : EventManager {
-    this.containers.get(getIdentifierOf(container)).resign(behaviour);
+  public removeListener(procedure : Procedure, container : Context | symbol) : EventManager {
+    this.containers.get(getIdentifierOf(container)).resign(procedure);
     return this;
   }
 

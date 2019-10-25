@@ -1,8 +1,8 @@
-import { BehaviourBuilder } from './behaviour-builder';
-import { BehaviourType } from '../utils/types';
 import { Context } from '../context/context';
+import { ProcedureBuilder } from './procedure-builder';
+import { ProcedureType } from '../utils/types';
 
-export class Behaviour extends BehaviourBuilder{
+export class Procedure extends ProcedureBuilder{
   public setContext(context : Context) : void {
     this._context = context;
   }
@@ -11,7 +11,7 @@ export class Behaviour extends BehaviourBuilder{
     return this._identifier;
   }
 
-  public get type() : BehaviourType {
+  public get type() : ProcedureType {
     return this._type;
   }
 

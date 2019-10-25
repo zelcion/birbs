@@ -1,32 +1,32 @@
-import { Behaviour } from '../src/behaviour/behaviour';
 import { Context } from '../src/context/context';
 import { EventManager } from '../src/manager/manager';
 import { expect } from 'chai';
+import { Procedure } from '../src/procedure/procedure';
 import { TeardownStrategies } from '../src/utils/types';
 
 describe('Manager methods', () => {
-  const myBehaviourIdentifier = Symbol('behaviourID');
-  const myBehaviourType = 'once';
+  const myProcedureIdentifier = Symbol('behaviourID');
+  const myProcedureType = 'once';
   const containerIdentifier = Symbol('MyContainerId');
   const conainerStrategy : TeardownStrategies = 'once';
 
   let defaultContainer : Context;
-  let devBehaviour : Behaviour;
+  let devProcedure : Procedure;
   beforeEach(() => {
-    const logFunction = (ev : Behaviour) : void => {
-      console.log(`Behaviour with identifier of ${String(ev.identifier)} has acted!`);
+    const logFunction = (ev : Procedure) : void => {
+      console.log(`Procedure with identifier of ${String(ev.identifier)} has acted!`);
     };
 
-    devBehaviour = new Behaviour()
-      .withIdentifier(myBehaviourIdentifier)
-      .withType(myBehaviourType)
+    devProcedure = new Procedure()
+      .withIdentifier(myProcedureIdentifier)
+      .withType(myProcedureType)
       .withAction(logFunction)
       .build();
 
     defaultContainer = new Context()
       .withStrategy(conainerStrategy)
       .withIdentifier(containerIdentifier)
-      .withBehaviours(devBehaviour)
+      .withProcedures(devProcedure)
       .build();
   });
   it('Manager creating and adding works', () => {
@@ -40,21 +40,21 @@ describe('Manager methods', () => {
     const defaultManager = new EventManager();
 
     let wasExecuted = false;
-    const anotherBehaviourId = Symbol('anotherId');
-    const anotherBehaviour = new Behaviour()
-      .withIdentifier(anotherBehaviourId)
+    const anotherProcedureId = Symbol('anotherId');
+    const anotherProcedure = new Procedure()
+      .withIdentifier(anotherProcedureId)
       .withType('always')
       .withAction(() => {wasExecuted = true;})
       .build();
 
     defaultManager.addContainer(defaultContainer);
-    defaultManager.listen(anotherBehaviour, containerIdentifier);
+    defaultManager.listen(anotherProcedure, containerIdentifier);
 
-    expect(defaultContainer.getBehaviour(myBehaviourIdentifier)).to.be.deep.equal(devBehaviour);
+    expect(defaultContainer.getProcedure(myProcedureIdentifier)).to.be.deep.equal(devProcedure);
 
-    defaultManager.broadcast(anotherBehaviourId);
+    defaultManager.broadcast(anotherProcedureId);
 
-    expect(defaultContainer.getBehaviour(myBehaviourIdentifier)).to.be.undefined;
+    expect(defaultContainer.getProcedure(myProcedureIdentifier)).to.be.undefined;
     expect(defaultManager.fetchContainer(containerIdentifier)).to.be.deep.equal(defaultContainer);
 
     defaultManager.removeContainer(containerIdentifier);

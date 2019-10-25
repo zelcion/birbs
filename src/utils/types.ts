@@ -1,16 +1,18 @@
-import { Behaviour } from '../behaviour/behaviour';
 import { Context } from '../context/context';
+import { Procedure } from '../procedure/procedure';
 
-export type Action = (event : Behaviour, context : Context) => void | Promise<void>;
+export type Action = (event : Procedure, context : Context) => void | Promise<void>;
 
 export type TeardownStrategies = 'all' | 'none' | 'once';
 
-export type BehaviourType = 'once' | 'always';
+export type ProcedureType = 'once' | 'always';
 
-export type BehaviourSignature = { identifier : symbol; type : BehaviourType };
+export type ProcedureSignature = { identifier : symbol; type : ProcedureType };
 
-export type VoidableBehaviourModifier = (behaviour : Behaviour) => void;
+export type VoidableProcedureModifier = (Procedure : Procedure) => void;
 
 export type VoidableContainerModifier = (container : Context) => void;
 
-export type Identifiable = Behaviour | Context;
+export type Identifiable = Procedure | Context;
+
+// export type EventRegistry = {  }
