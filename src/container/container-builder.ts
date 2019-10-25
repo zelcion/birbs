@@ -9,21 +9,16 @@ export class ContainerBuilder {
   protected _behaviours : Map<symbol, Behaviour> = new Map();
   protected _teardownStrategy : TeardownStrategies;
 
-  public build() : Container {
-    return this._instantiate(new Container());
-  };
-
-  private _instantiate (thisClass : Container) : Container {
-    const result = thisClass;
+  public build<T extends Container>(this : T) : T {
     this._modifiers.forEach((modifier) => {
-      modifier(result);
+      modifier(this);
     });
 
     this._modifiers = [];
-    return result;
-  }
+    return this;
+  };
 
-  public withIdentifier(identifier : symbol | string) : ContainerBuilder {
+  public withIdentifier<T extends Container>(this : T, identifier : symbol | string) : T {
     this._newModifier((container : Container) : void => {
       container._identifier = setSymbol(identifier);
     });
@@ -31,7 +26,7 @@ export class ContainerBuilder {
     return this;
   }
 
-  public withStrategy(teardownStrategy : TeardownStrategies) : ContainerBuilder {
+  public withStrategy<T extends Container>(this : T, teardownStrategy : TeardownStrategies) : T {
     throwStrategyInvalid(teardownStrategy);
 
     this._newModifier((container : Container) : void => {
@@ -41,7 +36,7 @@ export class ContainerBuilder {
     return this;
   }
 
-  public withBehaviours(behaviours : Behaviour | Behaviour[]) : ContainerBuilder {
+  public withBehaviours<T extends Container>(this : T, behaviours : Behaviour | Behaviour[]) : T {
     this._newModifier((container : Container) : void => {
       container.sign(behaviours);
     });

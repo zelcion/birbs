@@ -39,7 +39,10 @@ describe('container methods', () => {
     const anotherBehaviour = new Behaviour()
       .withIdentifier(anotherBehaviourId)
       .withType('always')
-      .withAction(() => {wasExecuted = true;})
+      .withAction((ev : Behaviour, context : Container) => {
+        wasExecuted = true;
+        console.log(context, ev);
+      })
       .build();
 
     const container = new Container()

@@ -70,6 +70,8 @@ export class Container extends ContainerBuilder{
   }
 
   public signBehaviourByType(behaviour : Behaviour) : void {
+    behaviour.setContext(this);
+
     if (behaviour.type === 'always') {
       this._emitter.on(behaviour.identifier, behaviour.Act);
       this._behaviours.set(behaviour.identifier, behaviour);

@@ -1,4 +1,5 @@
 import { Behaviour } from '../src/behaviour/behaviour';
+import { Container } from '../src/container/container';
 import { expect } from 'chai';
 
 describe('Behaviour methods', () => {
@@ -21,27 +22,24 @@ describe('Behaviour methods', () => {
 
     class CustomImplementation extends Behaviour {
       public isTropical = false;
-      public niibs : string;
+      public randomString : string;
 
-      public constructor(niibs : string) {
+      public constructor(randomString : string) {
         super();
-        this.niibs = niibs;
-      }
-
-      public loggy () : void {
-        console.log(this.niibs);
+        this.randomString = randomString;
       }
     }
 
-    const customAction = (ev : CustomImplementation) : void  => {
+    const customAction = (ev : CustomImplementation, context : Container) : void  => {
       ev.isTropical = true;
+      console.log(context);
+      console.log(ev);
     };
 
     const dev = new CustomImplementation('halal')
       .withIdentifier(myIdentifier)
       .withType(myType)
       .withAction(customAction)
-      .withOwnMethodAsAction('loggy')
       .build();
 
     dev.Act();
