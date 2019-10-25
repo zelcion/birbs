@@ -1,15 +1,15 @@
 import { setSymbol, throwStrategyInvalid } from '../utils/utils';
 import { TeardownStrategies, VoidableContainerModifier } from '../utils/types';
 import { Behaviour } from '../behaviour/behaviour';
-import { Container } from './container';
+import { Context } from './context';
 
-export class ContainerBuilder {
+export class ContextBuilder {
   private _modifiers : VoidableContainerModifier[] = [];
   protected _identifier : symbol;
   protected _behaviours : Map<symbol, Behaviour> = new Map();
   protected _teardownStrategy : TeardownStrategies;
 
-  public build<T extends Container>(this : T) : T {
+  public build<T extends Context>(this : T) : T {
     this._modifiers.forEach((modifier) => {
       modifier(this);
     });
@@ -18,26 +18,26 @@ export class ContainerBuilder {
     return this;
   };
 
-  public withIdentifier<T extends Container>(this : T, identifier : symbol | string) : T {
-    this._newModifier((container : Container) : void => {
+  public withIdentifier<T extends Context>(this : T, identifier : symbol | string) : T {
+    this._newModifier((container : Context) : void => {
       container._identifier = setSymbol(identifier);
     });
 
     return this;
   }
 
-  public withStrategy<T extends Container>(this : T, teardownStrategy : TeardownStrategies) : T {
+  public withStrategy<T extends Context>(this : T, teardownStrategy : TeardownStrategies) : T {
     throwStrategyInvalid(teardownStrategy);
 
-    this._newModifier((container : Container) : void => {
+    this._newModifier((container : Context) : void => {
       container._teardownStrategy = teardownStrategy;
     });
 
     return this;
   }
 
-  public withBehaviours<T extends Container>(this : T, behaviours : Behaviour | Behaviour[]) : T {
-    this._newModifier((container : Container) : void => {
+  public withBehaviours<T extends Context>(this : T, behaviours : Behaviour | Behaviour[]) : T {
+    this._newModifier((container : Context) : void => {
       container.sign(behaviours);
     });
 

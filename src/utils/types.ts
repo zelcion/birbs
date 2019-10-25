@@ -1,7 +1,7 @@
 import { Behaviour } from '../behaviour/behaviour';
-import { Container } from '../container/container';
+import { Context } from '../context/context';
 
-export type Action = (event : Behaviour, context : Container) => void | Promise<void>;
+export type Action = (event : Behaviour, context : Context) => void | Promise<void>;
 
 export type TeardownStrategies = 'all' | 'none' | 'once';
 
@@ -11,6 +11,6 @@ export type BehaviourSignature = { identifier : symbol; type : BehaviourType };
 
 export type VoidableBehaviourModifier = (behaviour : Behaviour) => void;
 
-export type VoidableContainerModifier = (container : Container) => void;
+export type VoidableContainerModifier = (container : Context) => void;
 
-export type Identifiable = Behaviour | Container;
+export type Identifiable = Behaviour | Context;

@@ -1,12 +1,12 @@
 import { getIdentifierOf, getStringFromSymbol } from '../utils/utils';
 import { Behaviour } from '../behaviour/behaviour';
 import { BehaviourType } from '../utils/types';
-import { ContainerBuilder } from './container-builder';
+import { ContextBuilder } from './context-builder';
 import { EventEmitter } from 'events';
 
 class CustomEmitter extends EventEmitter {};
 
-export class Container extends ContainerBuilder{
+export class Context extends ContextBuilder{
   private _emitter : CustomEmitter = new CustomEmitter;
 
   public get name() : string {
@@ -87,7 +87,7 @@ export class Container extends ContainerBuilder{
     this._teardown();
   }
 
-  public sign(behaviour : Behaviour[] | Behaviour) : Container {
+  public sign(behaviour : Behaviour[] | Behaviour) : Context {
     if (Array.isArray(behaviour)) {
       behaviour.forEach((event) => {
         this.signBehaviourByType(event);
@@ -99,7 +99,7 @@ export class Container extends ContainerBuilder{
     return this;
   }
 
-  public resign(behaviour : Behaviour[] | Behaviour | symbol[] | symbol) : Container {
+  public resign(behaviour : Behaviour[] | Behaviour | symbol[] | symbol) : Context {
     if (Array.isArray(behaviour)) {
       behaviour.forEach((event : symbol | Behaviour) => {
         this._emitter.removeAllListeners(getIdentifierOf(event));

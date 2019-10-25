@@ -1,25 +1,25 @@
 import { Behaviour } from '../behaviour/behaviour';
-import { Container } from '../container/container';
+import { Context } from '../context/context';
 import { getIdentifierOf } from '../utils/utils';
 
 export class EventManager {
-  private containers : Map<symbol, Container> = new Map();
+  private containers : Map<symbol, Context> = new Map();
 
-  public addContainer(container : Container) : EventManager {
+  public addContainer(container : Context) : EventManager {
     this.containers.set(container.identifier, container);
     return this;
   }
 
-  public removeContainer(container : Container | symbol) : EventManager {
+  public removeContainer(container : Context | symbol) : EventManager {
     this.containers.delete(getIdentifierOf(container));
     return this;
   }
 
-  public fetchContainer(containerIdentifier : symbol) : Container {
+  public fetchContainer(containerIdentifier : symbol) : Context {
     return this.containers.get(containerIdentifier);
   }
 
-  public broadcast(behaviour : Behaviour | symbol, container ?: Container | symbol) : EventManager {
+  public broadcast(behaviour : Behaviour | symbol, container ?: Context | symbol) : EventManager {
     const chosenContainer = (container !== undefined)?
       this.containers.get(getIdentifierOf(container)) : undefined;
 
@@ -35,12 +35,12 @@ export class EventManager {
     return this;
   }
 
-  public listen(behaviour : Behaviour, container : Container | symbol) : EventManager {
+  public listen(behaviour : Behaviour, container : Context | symbol) : EventManager {
     this.containers.get(getIdentifierOf(container)).sign(behaviour);
     return this;
   }
 
-  public removeListener(behaviour : Behaviour, container : Container | symbol) : EventManager {
+  public removeListener(behaviour : Behaviour, container : Context | symbol) : EventManager {
     this.containers.get(getIdentifierOf(container)).resign(behaviour);
     return this;
   }

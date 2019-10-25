@@ -1,14 +1,14 @@
 import { Action, BehaviourType, VoidableBehaviourModifier } from '../utils/types';
 import { setSymbol, throwTypeInvalid } from '../utils/utils';
 import { Behaviour } from './behaviour';
-import { Container } from '../container/container';
+import { Context } from '../context/context';
 
 export class BehaviourBuilder {
   private _modifiers : Array<VoidableBehaviourModifier> = [];
   protected _identifier : symbol;
   protected _type : BehaviourType;
   protected _actions : Map<symbol, Action> = new Map();
-  protected _context : Container;
+  protected _context : Context;
 
   public build <T extends Behaviour>(this : T) : T{
     this._modifiers.forEach((modifier) => {

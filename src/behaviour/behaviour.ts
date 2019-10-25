@@ -1,9 +1,9 @@
 import { BehaviourBuilder } from './behaviour-builder';
 import { BehaviourType } from '../utils/types';
-import { Container } from '../container/container';
+import { Context } from '../context/context';
 
 export class Behaviour extends BehaviourBuilder{
-  public setContext(context : Container) : void {
+  public setContext(context : Context) : void {
     this._context = context;
   }
 

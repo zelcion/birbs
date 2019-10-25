@@ -1,5 +1,5 @@
 import { Behaviour } from '../src/behaviour/behaviour';
-import { Container } from '../src/container/container';
+import { Context } from '../src/context/context';
 import { expect } from 'chai';
 
 describe('Behaviour methods', () => {
@@ -30,7 +30,7 @@ describe('Behaviour methods', () => {
       }
     }
 
-    const customAction = (ev : CustomImplementation, context : Container) : void  => {
+    const customAction = (ev : CustomImplementation, context : Context) : void  => {
       ev.isTropical = true;
       console.log(context);
       console.log(ev);

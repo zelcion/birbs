@@ -1,5 +1,5 @@
 import { Behaviour } from '../src/behaviour/behaviour';
-import { Container } from '../src/container/container';
+import { Context } from '../src/context/context';
 import { expect } from 'chai';
 import { TeardownStrategies } from '../src/utils/types';
 
@@ -18,11 +18,11 @@ describe('container methods', () => {
       .withAction(logFunction)
       .build();
   });
-  it('Container Builder works' ,() => {
+  it('Context Builder works' ,() => {
     const containerIdentifier = Symbol('MyContainerId');
     const conainerStrategy : TeardownStrategies = 'once';
 
-    const container = new Container()
+    const container = new Context()
       .withStrategy(conainerStrategy)
       .withIdentifier(containerIdentifier)
       .withBehaviours(devBehaviour)
@@ -31,7 +31,7 @@ describe('container methods', () => {
     expect(container.identifier).to.be.equal(containerIdentifier);
   });
 
-  it('Container publishing and flushing works', () => {
+  it('Context publishing and flushing works', () => {
     const containerIdentifier = Symbol('MyContainerId');
     const conainerStrategy : TeardownStrategies = 'once';
     let wasExecuted = false;
@@ -39,13 +39,13 @@ describe('container methods', () => {
     const anotherBehaviour = new Behaviour()
       .withIdentifier(anotherBehaviourId)
       .withType('always')
-      .withAction((ev : Behaviour, context : Container) => {
+      .withAction((ev : Behaviour, context : Context) => {
         wasExecuted = true;
         console.log(context, ev);
       })
       .build();
 
-    const container = new Container()
+    const container = new Context()
       .withStrategy(conainerStrategy)
       .withIdentifier(containerIdentifier)
       .withBehaviours([devBehaviour, anotherBehaviour])
@@ -75,7 +75,7 @@ describe('container methods', () => {
       .withAction(() => {console.log(true);})
       .build();
 
-    const container = new Container()
+    const container = new Context()
       .withStrategy(conainerStrategy)
       .withIdentifier(containerIdentifier)
       .withBehaviours([devBehaviour])

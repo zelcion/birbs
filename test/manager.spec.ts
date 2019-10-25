@@ -1,5 +1,5 @@
 import { Behaviour } from '../src/behaviour/behaviour';
-import { Container } from '../src/container/container';
+import { Context } from '../src/context/context';
 import { EventManager } from '../src/manager/manager';
 import { expect } from 'chai';
 import { TeardownStrategies } from '../src/utils/types';
@@ -10,7 +10,7 @@ describe('Manager methods', () => {
   const containerIdentifier = Symbol('MyContainerId');
   const conainerStrategy : TeardownStrategies = 'once';
 
-  let defaultContainer : Container;
+  let defaultContainer : Context;
   let devBehaviour : Behaviour;
   beforeEach(() => {
     const logFunction = (ev : Behaviour) : void => {
@@ -23,7 +23,7 @@ describe('Manager methods', () => {
       .withAction(logFunction)
       .build();
 
-    defaultContainer = new Container()
+    defaultContainer = new Context()
       .withStrategy(conainerStrategy)
       .withIdentifier(containerIdentifier)
       .withBehaviours(devBehaviour)
