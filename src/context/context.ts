@@ -2,7 +2,7 @@ import { getIdentifierOf, getStringFromSymbol } from '../utils/utils';
 import { ContextBuilder } from './context-builder';
 import { EventEmitter } from 'events';
 import { Procedure } from '../procedure/procedure';
-import { ProcedureType } from '../utils/types';
+import { ProcedureLifecycle } from '../utils/types';
 
 class CustomEmitter extends EventEmitter {};
 
@@ -27,64 +27,52 @@ export class Context extends ContextBuilder{
     const procedureToBeEmitted : Procedure = (typeof procedure === 'symbol')?
       this._procedures.get(procedure) :
       procedure;
+    this._emitter.emit(procedureToBeEmitted.identifier, this);
 
-    this._emitter.emit(procedureToBeEmitted.identifier, procedureToBeEmitted);
-
-    this._teardown();
+    this._teardown(procedureToBeEmitted);
   }
 
-  private _teardown() : void {
-    if (this._teardownStrategy === 'none') {
+  private _teardown(procedure : Procedure) : void {
+    if (procedure.lifecycle === 'ephemeral') this.resign(procedure);
+
+    if (this._flushingStrategy === 'no-flush') {
       return;
     }
 
-    if (this._teardownStrategy === 'all') {
-      this._procedures.forEach((procedure) => {
-        this._emitter.removeAllListeners(procedure.identifier);
-      });
-
-      this._procedures = new Map();
-      return;
+    if (this._flushingStrategy === 'each-publish') {
+      this._clearEphemeralProcedures();
     }
-
-    this._filterOnceProcedures();
   }
 
-  private _filterOnceProcedures() : void {
+  private _clearEphemeralProcedures() : void {
     this._procedures.forEach((procedure) => {
-      if (procedure.type === 'once') this._emitter.removeAllListeners(procedure.identifier);
+      if (procedure.lifecycle === 'ephemeral') this._emitter.removeAllListeners(procedure.identifier);
     });
 
-    this._getProcedureListByType('once').forEach((procedure) => {
+    this._getProcedureListByType('ephemeral').forEach((procedure) => {
       this._procedures.delete(procedure.identifier);
     });
   }
 
-  private _getProcedureListByType(type : ProcedureType) : Procedure[] {
+  private _getProcedureListByType(type : ProcedureLifecycle) : Procedure[] {
     const list : Procedure[] = [];
     this._procedures.forEach((procedure) => {
-      if (procedure.type === type) list.push(procedure);
+      if (procedure.lifecycle === type) list.push(procedure);
     });
 
     return list;
   }
 
   public signProcedureByType(procedure : Procedure) : void {
-    procedure.setContext(this);
+    this._procedures.set(procedure.identifier, procedure);
 
-    if (procedure.type === 'always') {
+    if (procedure.lifecycle === 'permanent') {
       this._emitter.on(procedure.identifier, procedure.Act);
-      this._procedures.set(procedure.identifier, procedure);
       return;
     }
 
     this._emitter.once(procedure.identifier, procedure.Act);
-    this._procedures.set(procedure.identifier, procedure);
     return;
-  }
-
-  public flush() : void {
-    this._teardown();
   }
 
   public sign(procedure : Procedure[] | Procedure) : Context {

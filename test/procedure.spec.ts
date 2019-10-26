@@ -1,11 +1,12 @@
 import { Context } from '../src/context/context';
+import { Effect } from '../src/utils/types';
 import { expect } from 'chai';
 import { Procedure } from '../src/procedure/procedure';
 
 describe('Procedure methods', () => {
   it('Procedure Builder works' ,() => {
     const myIdentifier = Symbol('behaviourID');
-    const myType = 'once';
+    const myType = 'ephemeral';
 
     const dev = new Procedure()
       .withIdentifier(myIdentifier)
@@ -13,12 +14,12 @@ describe('Procedure methods', () => {
       .build();
 
     expect(dev.identifier).to.be.equal(myIdentifier);
-    expect(dev.type).to.be.equal(myType);
+    expect(dev.lifecycle).to.be.equal(myType);
   });
 
-  it('Procedure extension and Actions works', () => {
+  it('Procedure extension and Effects works', () => {
     const myIdentifier = Symbol('behaviourID');
-    const myType = 'once';
+    const myType = 'ephemeral';
 
     class CustomImplementation extends Procedure {
       public isTropical = false;
@@ -30,19 +31,26 @@ describe('Procedure methods', () => {
       }
     }
 
-    const customAction = (ev : CustomImplementation, context : Context) : void  => {
-      ev.isTropical = true;
-      console.log(context);
-      console.log(ev);
-    };
+    class CustomEffect implements Effect {
+      public execution (ev : CustomImplementation) : void {
+        ev.isTropical = true;
+      }
+    }
 
-    const dev = new CustomImplementation('halal')
+    const dev = new CustomImplementation('1234abcd')
       .withIdentifier(myIdentifier)
       .withType(myType)
-      .withAction(customAction)
+      .withEffect(new CustomEffect())
       .build();
 
-    dev.Act();
+    const contextId = Symbol('contextId');
+    const customContext = new Context()
+      .withIdentifier(contextId)
+      .withProcedures(dev)
+      .withStrategy('no-flush')
+      .build();
+
+    customContext.publish(myIdentifier);
     expect(dev.isTropical).to.be.equal(true);
   });
 });

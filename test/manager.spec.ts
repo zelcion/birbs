@@ -1,26 +1,28 @@
+import { Effect, FlushingStrategies } from '../src/utils/types';
 import { Context } from '../src/context/context';
 import { EventManager } from '../src/manager/manager';
 import { expect } from 'chai';
 import { Procedure } from '../src/procedure/procedure';
-import { TeardownStrategies } from '../src/utils/types';
 
 describe('Manager methods', () => {
   const myProcedureIdentifier = Symbol('behaviourID');
-  const myProcedureType = 'once';
+  const myProcedureType = 'ephemeral';
   const containerIdentifier = Symbol('MyContainerId');
-  const conainerStrategy : TeardownStrategies = 'once';
+  const conainerStrategy : FlushingStrategies = 'each-publish';
 
   let defaultContainer : Context;
   let devProcedure : Procedure;
   beforeEach(() => {
-    const logFunction = (ev : Procedure) : void => {
-      console.log(`Procedure with identifier of ${String(ev.identifier)} has acted!`);
-    };
+    class LoggerEffect implements Effect {
+      public execution (ev : Procedure) : void {
+        console.log(`Procedure with identifier of ${String(ev.identifier)} has acted!`);
+      }
+    }
 
     devProcedure = new Procedure()
       .withIdentifier(myProcedureIdentifier)
       .withType(myProcedureType)
-      .withAction(logFunction)
+      .withEffect(new LoggerEffect())
       .build();
 
     defaultContainer = new Context()
@@ -39,12 +41,18 @@ describe('Manager methods', () => {
   it('Manager broadcasting and removing works', () => {
     const defaultManager = new EventManager();
 
+    class ChangeExecutionState implements Effect {
+      execution () : void {
+        wasExecuted = true;
+      }
+    }
+
     let wasExecuted = false;
     const anotherProcedureId = Symbol('anotherId');
     const anotherProcedure = new Procedure()
       .withIdentifier(anotherProcedureId)
-      .withType('always')
-      .withAction(() => {wasExecuted = true;})
+      .withType('permanent')
+      .withEffect(new ChangeExecutionState)
       .build();
 
     defaultManager.addContainer(defaultContainer);

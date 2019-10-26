@@ -1,14 +1,13 @@
-import { Action, ProcedureType, VoidableProcedureModifier } from '../utils/types';
+import { Effect, ProcedureLifecycle, VoidableProcedureModifier } from '../utils/types';
 import { setSymbol, throwTypeInvalid } from '../utils/utils';
-import { Context } from '../context/context';
 import { Procedure } from './procedure';
 
 export class ProcedureBuilder {
   private _modifiers : Array<VoidableProcedureModifier> = [];
   protected _identifier : symbol;
-  protected _type : ProcedureType;
-  protected _actions : Map<symbol, Action> = new Map();
-  protected _context : Context;
+  protected _lifecycle : ProcedureLifecycle;
+  protected _effects : Map<symbol, Effect> = new Map();
+  // TODO: Make effects an array because they don't need to be retrieved
 
   public build <T extends Procedure>(this : T) : T{
     this._modifiers.forEach((modifier) => {
@@ -27,21 +26,21 @@ export class ProcedureBuilder {
     return this;
   }
 
-  public withType <T extends Procedure>(this : T, type : ProcedureType) : T {
-    throwTypeInvalid(type);
+  public withType <T extends Procedure>(this : T, lifecycle : ProcedureLifecycle) : T {
+    throwTypeInvalid(lifecycle);
 
     this._newModifier((procedure : T) : void => {
-      procedure._type = type;
+      procedure._lifecycle = lifecycle;
     });
 
     return this;
   }
 
-  public withAction <T extends Procedure>(this : T, action : Action) : T {
+  public withEffect <T extends Procedure>(this : T, effect : Effect) : T {
     this._newModifier((procedure : T) : void => {
-      const actionKey : symbol = setSymbol('unchangeable');
+      const effectKey : symbol = setSymbol('unchangeable');
 
-      procedure._actions.set(actionKey, action);
+      procedure._effects.set(effectKey, effect);
     });
 
     return this;
@@ -49,16 +48,16 @@ export class ProcedureBuilder {
 
   // SAD: For now there is no solution to not use string :(
   // EXPERIMENTAL FEATURE
-  public withOwnMethodAsAction <T extends Procedure>(this : T, action : string) : T {
+  public withOwnMethodAsEffect <T extends Procedure>(this : T, effect : string) : T {
     this._newModifier((procedure : T) : void => {
-      const actionKey : symbol = setSymbol('unchangeable');
-      if (typeof procedure[action] !== 'function') {
-        throw new Error('Action must be a name of a method of your Procedure');
+      const effectKey : symbol = setSymbol('unchangeable');
+      if (typeof procedure[effect] !== 'function') {
+        throw new Error('Effect must be a name of a method of your Procedure');
       }
 
-      procedure[action] = procedure[action].bind(procedure);
-      procedure._actions.set(actionKey, procedure[action]);
-      procedure[action]();
+      procedure[effect] = procedure[effect].bind(procedure);
+      procedure._effects.set(effectKey, procedure[effect]);
+      procedure[effect]();
     });
 
     return this;

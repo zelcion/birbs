@@ -1,4 +1,4 @@
-import { Identifiable, ProcedureType, TeardownStrategies } from './types';
+import { FlushingStrategies, Identifiable, ProcedureLifecycle } from './types';
 
 export const setSymbol = (entry : symbol | string) : symbol => {
   let result : symbol;
@@ -21,14 +21,14 @@ export const getIdentifierOf = (identity : Identifiable | symbol) : symbol => {
   return identity.identifier;
 };
 
-export const throwTypeInvalid = (type : ProcedureType) : void => {
-  if(type !== 'once' && type !== 'always') {
-    throw new Error('Unrecognized type in builder! Type must be either "once" or "always"!');
+export const throwTypeInvalid = (type : ProcedureLifecycle) : void => {
+  if(type !== 'ephemeral' && type !== 'permanent') {
+    throw new Error('Unrecognized type in builder! Type must be either "ephemeral" or "permanent"!');
   }
 };
 
-export const throwStrategyInvalid = (type : TeardownStrategies) : void => {
-  if(type !== 'once' && type !== 'all' && type !== 'none') {
-    throw new Error('Unrecognized type in builder! Type must be "once", or "all", or "none"!');
+export const throwStrategyInvalid = (type : FlushingStrategies) : void => {
+  if(type !== 'each-publish' && type !== 'no-flush') {
+    throw new Error('Unrecognized type in builder! Type must be "each-publish", or "no-flush"!');
   }
 };

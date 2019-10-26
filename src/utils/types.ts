@@ -1,13 +1,15 @@
 import { Context } from '../context/context';
 import { Procedure } from '../procedure/procedure';
 
-export type Action = (event : Procedure, context : Context) => void | Promise<void>;
+export abstract class Effect {
+  abstract execution(event : Procedure) : void | Promise<void>;
+};
 
-export type TeardownStrategies = 'all' | 'none' | 'once';
+export type FlushingStrategies = 'no-flush' | 'each-publish';
 
-export type ProcedureType = 'once' | 'always';
+export type ProcedureLifecycle = 'ephemeral' | 'permanent'; // TODO -> Pick better name than ephemeral
 
-export type ProcedureSignature = { identifier : symbol; type : ProcedureType };
+export type ProcedureSignature = { identifier : symbol; lifecycle : ProcedureLifecycle };
 
 export type VoidableProcedureModifier = (Procedure : Procedure) => void;
 

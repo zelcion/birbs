@@ -1,5 +1,5 @@
+import { FlushingStrategies, VoidableContainerModifier } from '../utils/types';
 import { setSymbol, throwStrategyInvalid } from '../utils/utils';
-import { TeardownStrategies, VoidableContainerModifier } from '../utils/types';
 import { Context } from './context';
 import { Procedure } from '../procedure/procedure';
 
@@ -7,9 +7,10 @@ export class ContextBuilder {
   private _modifiers : VoidableContainerModifier[] = [];
   protected _identifier : symbol;
   protected _procedures : Map<symbol, Procedure> = new Map();
-  protected _teardownStrategy : TeardownStrategies;
+  protected _flushingStrategy : FlushingStrategies;
 
   public build<T extends Context>(this : T) : T {
+    // TODO :Add guardRails on build to not build without the three requirements
     this._modifiers.forEach((modifier) => {
       modifier(this);
     });
@@ -19,26 +20,26 @@ export class ContextBuilder {
   };
 
   public withIdentifier<T extends Context>(this : T, identifier : symbol | string) : T {
-    this._newModifier((container : Context) : void => {
-      container._identifier = setSymbol(identifier);
+    this._newModifier((context : Context) : void => {
+      context._identifier = setSymbol(identifier);
     });
 
     return this;
   }
 
-  public withStrategy<T extends Context>(this : T, teardownStrategy : TeardownStrategies) : T {
-    throwStrategyInvalid(teardownStrategy);
+  public withStrategy<T extends Context>(this : T, flushingStrategy : FlushingStrategies) : T {
+    throwStrategyInvalid(flushingStrategy);
 
-    this._newModifier((container : Context) : void => {
-      container._teardownStrategy = teardownStrategy;
+    this._newModifier((context : Context) : void => {
+      context._flushingStrategy = flushingStrategy;
     });
 
     return this;
   }
 
   public withProcedures<T extends Context>(this : T, procedures : Procedure | Procedure[]) : T {
-    this._newModifier((container : Context) : void => {
-      container.sign(procedures);
+    this._newModifier((context : Context) : void => {
+      context.sign(procedures);
     });
 
     return this;

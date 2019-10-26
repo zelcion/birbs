@@ -4,6 +4,10 @@ import { Procedure } from '../procedure/procedure';
 
 export class EventManager {
   private containers : Map<symbol, Context> = new Map();
+  // TODO: Add registry of calls, saved by timestamp, context, and procedure
+  // Also make methods to retrieve them
+
+  // Test making this a singleton in `process.eventManager`
 
   public addContainer(container : Context) : EventManager {
     this.containers.set(container.identifier, container);
