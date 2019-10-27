@@ -20,13 +20,13 @@ Capture and admire all your joyful events with this event manager and encapsulat
 
 ## What is Birbs? Why Birbs?
 
-Birbs is an Event encapsulator that gives context and extensability to node's plain events. It's objective is to bring the marvels of encapsulation and polymorfism of OOP into the world of Events!
+Birbs is an Event encapsulator that gives context and extensibility to Node's plain events. It's objective is to bring the marvels of encapsulation and polymorphism of OOP into the world of Events, and doing that in a easily pluggable fashion!
 
-For instance, with it you can reuse a `Behaviour` of your application in different contexts, let's say an error handler for an API response. Just bind the handler to a `Behaviour` and `.broadcast()` it to it's `Container`!
+By encapsulating your application's events, it is possible to control all the flow of your application and decouple many parts of it, allowing you to reuse your routines and procedures and make them have different impacts depending on the context they're in. Let's say for example you have a Super Market application. There you have a `MeatDepartment` domain and a `FruitDepartment` domain. For theese both you need a function or method called `getWeight()`. With birbs it is possible to have a `Procedure` with this name, and use it to either weight Meat or Fruits!
 
-Birbs is internally built on Node's internal robust events engine, and got no other dependency at all! Also it helps you to encapsulate expected behaviors in namespaces for you to have a much more wholesome (and controlled) experience when dealing with events. 
+Having that kind of use in mind, Birbs is designed to be effortlessly pluggable in your already mature application, or help you develop a new one, entirely event-oriented from scracth, for you to have a much more wholesome (and controlled) experience when dealing with events. 
 
-Personally, I find it helpful to dispatch events with multiple listeners, which are to be executed only once, and are instantiated every call to expect a response.
+Also, it is internally built on Node's internal robust events engine, and got no other dependency at all!
 
 Oh, it also uses typescript!
 
