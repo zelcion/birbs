@@ -69,5 +69,7 @@ describe('Manager methods', () => {
 
     expect(defaultManager.fetchContainer(containerIdentifier)).to.be.undefined;
     expect(wasExecuted).to.be.true;
+
+    console.log(defaultManager.getEventHistory());
   });
 });

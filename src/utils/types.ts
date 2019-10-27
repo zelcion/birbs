@@ -17,4 +17,9 @@ export type VoidableContainerModifier = (container : Context) => void;
 
 export type Identifiable = Procedure | Context;
 
-// export type EventRegistry = {  }
+export type EventRegistryQuery = {
+  minimumDate ?: Date;
+  maximumDate ?: Date;
+  procedureId ?: symbol;
+  contextId ?: symbol;
+};
