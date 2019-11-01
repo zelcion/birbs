@@ -19,8 +19,8 @@ export class Procedure extends ProcedureBuilder{
   public async Act(context : Context) : Promise<void> {
     const executionCompletion = [];
     this._effects.forEach((effect) => {
-      effect.execution = effect.execution.bind(context);
-      executionCompletion.push(effect.execution(this));
+      const exec = effect.execution.bind(context);
+      executionCompletion.push(exec(this));
     });
 
     await Promise.all(executionCompletion);

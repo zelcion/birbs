@@ -21,14 +21,14 @@ export const getIdentifierOf = (identity : Identifiable | symbol) : symbol => {
   return identity.identifier;
 };
 
-export const throwTypeInvalid = (type : ProcedureLifecycle) : void => {
+export const throwInvalidProcedureLifecycle = (type : ProcedureLifecycle) : void => {
   if(type !== 'ephemeral' && type !== 'permanent') {
-    throw new Error('Unrecognized type in builder! Type must be either "ephemeral" or "permanent"!');
+    throw TypeError('Unrecognized type in builder! Type must be either "ephemeral" or "permanent"!');
   }
 };
 
 export const throwStrategyInvalid = (type : FlushingStrategies) : void => {
   if(type !== 'each-publish' && type !== 'no-flush') {
-    throw new Error('Unrecognized type in builder! Type must be "each-publish", or "no-flush"!');
+    throw TypeError('Unrecognized type in builder! Type must be "each-publish", or "no-flush"!');
   }
 };

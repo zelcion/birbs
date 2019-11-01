@@ -1,15 +1,20 @@
+import { FlushingStrategies, ProcedureLifecycle } from '../utils/types';
 import { getIdentifierOf, getStringFromSymbol } from '../utils/utils';
+import { throwIfNoProcedureFound, throwNoProceduresRegistered } from '../utils/error-handler';
 import { ContextBuilder } from './context-builder';
 import { EventEmitter } from 'events';
 import { Procedure } from '../procedure/procedure';
-import { ProcedureLifecycle } from '../utils/types';
 
 class CustomEmitter extends EventEmitter {};
 
 export class Context extends ContextBuilder{
   private _emitter : CustomEmitter = new CustomEmitter;
 
-  public get name() : string {
+  public get flushingStrategy() : FlushingStrategies {
+    return this._flushingStrategy;
+  }
+
+  public get identifierName() : string {
     return getStringFromSymbol(this._identifier);
   };
 
@@ -17,16 +22,14 @@ export class Context extends ContextBuilder{
     return this._identifier;
   }
 
-  public getEmitter(identifier : symbol) : CustomEmitter {
-    if (identifier === this.identifier) {
-      return this._emitter;
-    }
-  }
-
   public publish(procedure : Procedure | symbol) : void {
+    throwNoProceduresRegistered(this._procedures);
+
     const procedureToBeEmitted : Procedure = (typeof procedure === 'symbol')?
       this._procedures.get(procedure) :
       procedure;
+
+    throwIfNoProcedureFound(procedureToBeEmitted);
     this._emitter.emit(procedureToBeEmitted.identifier, this);
 
     this._teardown(procedureToBeEmitted);
@@ -45,6 +48,8 @@ export class Context extends ContextBuilder{
   }
 
   private _clearEphemeralProcedures() : void {
+    throwNoProceduresRegistered(this._procedures);
+
     this._procedures.forEach((procedure) => {
       if (procedure.lifecycle === 'ephemeral') this._emitter.removeAllListeners(procedure.identifier);
     });
@@ -63,7 +68,7 @@ export class Context extends ContextBuilder{
     return list;
   }
 
-  public signProcedureByType(procedure : Procedure) : void {
+  public _signProcedureByType(procedure : Procedure) : void {
     this._procedures.set(procedure.identifier, procedure);
 
     if (procedure.lifecycle === 'permanent') {
@@ -78,12 +83,12 @@ export class Context extends ContextBuilder{
   public sign(procedure : Procedure[] | Procedure) : Context {
     if (Array.isArray(procedure)) {
       procedure.forEach((event) => {
-        this.signProcedureByType(event);
+        this._signProcedureByType(event);
       });
       return;
     }
 
-    this.signProcedureByType(procedure);
+    this._signProcedureByType(procedure);
     return this;
   }
 
@@ -96,6 +101,7 @@ export class Context extends ContextBuilder{
       return;
     }
 
+    this._emitter.removeAllListeners(getIdentifierOf(procedure));
     this._procedures.delete(getIdentifierOf(procedure));
     return this;
   }
