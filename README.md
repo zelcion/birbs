@@ -1,5 +1,6 @@
-[![Build Status](https://travis-ci.org/flgmjr/birbs.svg?branch=master)](https://travis-ci.org/flgmjr/birbs)
 # Birbs 
+[![Build Status](https://travis-ci.org/flgmjr/birbs.svg?branch=master)](https://travis-ci.org/flgmjr/birbs)
+
 Capture and admire all your joyful events with this event manager and encapsulator!
 
 --------------------
@@ -35,65 +36,185 @@ Oh, it also uses typescript!
 npm i birbs --save
 ```
 
-## How to use it?
-_For a more detailed explanation of each class, refer to the `API Reference` section._
-1. Import Birbs' classes to your project, set the Container and EventManager, and add the context to the Manager.
-   ```javascript
-   import { Behaviour, Container, EventManager } from 'birbs'
-   //                      or
-   const { Behaviour, Container, EventManager } = require('birbs');
+## Example: Chat Application _[js]_
+>_For a more detailed explanation of each class, refer to the `API Reference` section._
 
-   const myEventManager = new EventManager();
-   const contextIdentifier = Symbol('ContainerIdentity')
-   const myContext = new Container(contextIdentifier, 'once');
-   // see flushStrategies to know about this second argument
-   myEventManager.addContainer(myContext);
+Let's say here we got to do a chat Application. We would like to have the features of different Rooms and message notifications!
+
+For the sake of simplicity, we will not create all the servers and routes, just execute it in Node directly.
+
+1. Let's create the class for our `ChatRoom`!
+   ```javascript
+   // ChatRoom.js
+
+   import { Context } from 'birbs'
+   //          or
+   const { Context } = require('birbs');
+
+   module.exports = class ChatRoom extends Context {
+     constructor (name) {
+       super();
+       this.chatRoomName = name;
+       this.messages = [];
+       this.participants = [];
+     }
+
+     receive (user) {
+       this.participants.push(user);
+     }
+
+     post (message) {
+       this.messages.push(message);
+
+       // Later we will notify our users here! ;)
+     }
+
+     get latestMessage () {
+       return this.messages[this.messages.length -1];
+     }
+   }
    ```
-   One important thing to notice is that although you can use pure strings as Identifiers, Birbs uses symbols internally, so if you opt to use strings to name your Containers/Behaviours you will need to save them to constants or you won't be able to fetch them later. So keep in mind that symbols are a good practice with Birbs, and they enable you to get a better decoupling because you will never really need to refer to the original class instance more than one time.
+   Extending Context means that the class contains relevant data and information about the domain it's talking about, or means that it represents the domain itself.
 
-   Oh, also you will be able to do a really clever use of some methods when the same behaviour is shared across contexts ;)
+   Later on you will realize that all the wiring can be done outside of the class files, so it's possible to use all the features Birbs can provide without having it standing between you and your application.
 
-2. Create (and/or extend) your Behaviour.
+2. Now let's also create the `User` and `Message`.
    ```javascript
-   class MyNewBehaviour extends Behaviour {
-      get myExtendedProperty () {
-        return 'hello world';
+   // User.js
+   module.exports = class User {
+      constructor (userName) {
+        this.userName = userName;
+        this.messagesWritten = [];
+        this.unreadNotifications = [];
+        this.currentChatRoom = null;
+      }
+
+      join (chatRoom) {
+        chatRoom.receive(this);
+        this.currentChatRoom = chatRoom;
+      }
+
+      writeMessage (messageContent) {
+        const aMessage = new Message(
+          messageContent, this.userName
+        );
+
+        this.currentChatRoom.post(aMessage);
       }
    };
-
-   const newBehaviourIdentifier = Symbol('BehaviourId');
-
-   const newBehaviourInstance = new MyNewBehaviour(
-     { identifier: newBehaviourIdentifier, type: 'always' }
-    )
-   // see Behaviour Types in the API Reference 
    ```
 
-3. Create and add Actions to take when the event is fired.
    ```javascript
-   const showMeTheWorld = (behaviour) => {
-     console.log(behaviour.myExtendedProperty);
-   };
-   const showMeTheWorldIdentifier = Symbol('showMeTheWorld');
-   // It is possible to overwrite an action if you .bindAction()
-   // again with the same identifier (if it's a symbol).
-   newBehaviourInstance.bindAction(
-     showMeTheWorld,
-     showMeTheWorldIdentifier
-   );
+   // Message.js
+   class Message {
+     constructor (content, author) {
+       this.content = content;
+       this.author = author;
+     }
+   }
    ```
-   Your Actions functions/callbacks recieves as an argument the Behaviour itself, which makes possible for interesting applications to be made.
 
-4. Listen, and Broadcast your new behaviour!
+3. We already have the main functionality, now let's add our application's `Procedures` and `Effects`.
    ```javascript
-   myEventManager.listen(newBehaviourInstance, contextIdentifier);
+   // NotificationProcedure.js
+   import { Procedure } from 'birbs'
+   //          or
+   const { Procedure } = require('birbs');
 
-   myEventManager.broadcast(
-     newBehaviourIdentifier,
-     contextIdentifier
-   );
-   // Should log 'hello world'
+   module.exports = class NotificationProcedure extends Procedure {
+     constructor (baseMessage) {
+       super();
+       this.baseMessage = baseMessage;
+     }
+   }
    ```
+   We'll just add a custom notification message in this procedure for now.
+
+   ```javascript
+   // LogNotificationEffect.js
+   module.exports = class NotifyNewMessage {
+     execution(notification) {
+       // This method recieves as an arugment the Procedure
+       // it belongs, and is bound to the context it's fired at.
+
+       console.log(
+         `${notification.baseMessage}
+          room: ${this.chatRoomName}
+          author: ${this.latestMessage.author}
+          message: ${this.latestMessage.content}`
+       );
+     }
+   }
+   ```
+   We call the classes with `execute(Procedure)` Effects. If we would be using typescript, we would need to `implement` it.
+
+4. Let's wire everything up!
+
+   Until now we have just programmed our application as we would if we did not use Birbs, afterall we just extended our classes.
+
+   That is a good thing for us, it means that you can use Birbs without having to worry about it most of the time, but now we will need to set our events (Procedures) and Contexts to be used!
+
+   ```javascript
+   // main.js
+   // Import/Require all extended Classes here
+
+   // setup your Notification Procedure
+   const notificationId = Symbol('notification');
+   const notifyNewMessages = new NotificationProcedure('New message received!')
+     .withIdentifier(notificationId)
+     .withType('permanent')
+     .withEffect(new NotifyNewMessage())
+     .build()
+
+   // setup your rooms
+   const coolPeopleRoomId = Symbol('coolPeople')
+   const coolPeopleRoom = new ChatRoom('Cool People')
+     .withIdentifier(coolPeopleRoomId)
+     .withStrategy('no-flush')
+     .withProcedures(notifyNewMessages)
+     .build();
+   
+   const funnyPeopleRoomId = Symbol('funnyPeople')
+   const funnyPeopleRoom = new ChatRoom('Funny People')
+     .withIdentifier(funnyPeopleRoomId)
+     .withStrategy('no-flush')
+     .withProcedures(notifyNewMessages)
+     .build();
+   ```
+   You probably realized the use of `Symbol()`. Birbs uses symbols internally to ensure unique keys and identifiers, so even if you might mess up and give two things the same name, Birbs will know their difference. Also, Symbols enable you to get a better decoupling because you will never really need to refer to the original class instance more than once.
+
+   Oh, let's not forget to change our comment on the `ChatRoom` class!
+
+   ```javascript
+   // ChatRoom.js
+   {...}
+
+   post (message) {
+       this.messages.push(message);
+
+       // You will need a reference to the
+       // id of your procedure when executing it.
+       this.publish(notificationId);
+   }
+   ```
+
+5. We are ready! Let's chat!
+
+    ```javascript
+    // app.js
+
+    const james = new User('James');
+    const robert = new User('Robert');
+    const mary = new User('Mary');
+    const nancy = new User('Nancy');
+
+    james.join(coolPeopleRoom);
+    mary.join(funnyPeopleRoom);
+
+    // See the magic happen!
+    james.writeMessage('Hello World!');
+    mary.writeMessage('Hey Everyone!');
+    ```
 
 -------
 # API Reference
