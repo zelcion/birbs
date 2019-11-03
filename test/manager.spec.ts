@@ -7,10 +7,10 @@ import { Procedure } from '../src/procedure/procedure';
 describe('Manager methods', () => {
   const myProcedureIdentifier = Symbol('behaviourID');
   const myProcedureType = 'ephemeral';
-  const containerIdentifier = Symbol('MyContainerId');
+  const containerIdentifier = Symbol('MyContextId');
   const conainerStrategy : FlushingStrategies = 'each-publish';
 
-  let defaultContainer : Context;
+  let defaultContext : Context;
   let devProcedure : Procedure;
   beforeEach(() => {
     class LoggerEffect implements Effect {
@@ -25,7 +25,7 @@ describe('Manager methods', () => {
       .withEffect(new LoggerEffect())
       .build();
 
-    defaultContainer = new Context()
+    defaultContext = new Context()
       .withStrategy(conainerStrategy)
       .withIdentifier(containerIdentifier)
       .withProcedures(devProcedure)
@@ -34,9 +34,9 @@ describe('Manager methods', () => {
   it('Manager creating and adding works', () => {
     const defaultManager = new EventManager();
 
-    defaultManager.addContainer(defaultContainer);
+    defaultManager.addContext(defaultContext);
 
-    expect(defaultManager.fetchContainer(containerIdentifier)).to.be.deep.equal(defaultContainer);
+    expect(defaultManager.fetchContext(containerIdentifier)).to.be.deep.equal(defaultContext);
   });
   it('Manager broadcasting and removing works', () => {
     const defaultManager = new EventManager();
@@ -55,19 +55,19 @@ describe('Manager methods', () => {
       .withEffect(new ChangeExecutionState)
       .build();
 
-    defaultManager.addContainer(defaultContainer);
-    defaultManager.listen(anotherProcedure, containerIdentifier);
+    defaultManager.addContext(defaultContext);
+    defaultManager.addProcedure(anotherProcedure, containerIdentifier);
 
-    expect(defaultContainer.getProcedure(myProcedureIdentifier)).to.be.deep.equal(devProcedure);
+    expect(defaultContext.getProcedure(myProcedureIdentifier)).to.be.deep.equal(devProcedure);
 
     defaultManager.broadcast(anotherProcedureId);
 
-    expect(defaultContainer.getProcedure(myProcedureIdentifier)).to.be.undefined;
-    expect(defaultManager.fetchContainer(containerIdentifier)).to.be.deep.equal(defaultContainer);
+    expect(defaultContext.getProcedure(myProcedureIdentifier)).to.be.undefined;
+    expect(defaultManager.fetchContext(containerIdentifier)).to.be.deep.equal(defaultContext);
 
-    defaultManager.removeContainer(containerIdentifier);
+    defaultManager.removeContext(containerIdentifier);
 
-    expect(defaultManager.fetchContainer(containerIdentifier)).to.be.undefined;
+    expect(defaultManager.fetchContext(containerIdentifier)).to.be.undefined;
     expect(wasExecuted).to.be.true;
   });
 });

@@ -219,35 +219,75 @@ For the sake of simplicity, we will not create all the servers and routes, just 
 -------
 # API Reference
 
-The Birbs API was developed with flexibility, immutability and decoupling, as basic principles, so you will notice that while there are many ways to add behaviour to a class, there are none to remove instead of not adding it at all.
+Before everything, let's talk about our names. In birbs there are four important names for you to know: `EventManager`, `Context`, `Procedure`, and `Effect`. EventManager is the easier one to understand, it's the entity that you can use to broadcast an event to a context withoutt having any reference to neither, just their Ids.
 
-While this is an ongoing project
+Now for the other three, it is better to first understand their relation. Contexts have Procedures to use or execute in it's lifetime. Procedures each have at least one Effect to be triggered when needed. Context don't know about Effects, but Effects have direct references to the context that triggered their procedure. When a procedure is used, the control is passed from the context, to the procedure, into the effect.
 
-## Behaviour > _Class_
-The Behaviour class is the main class of Birbs. It contains the actions/callbacks and the data that you want it to work with.
+#### Notes:
+- Birbs has native support for typescript.
+- Birbs classes does not use Constructors, they use builders.
 
-Also, this class is MEANT to be extended, so you can add your custom properties, data, and methods to it.
+## EventManager
+It is the entity that you can use to trigger a Procedure in a Context. It is also possible to use it as a context group.
 
-### **Class Constructor**
-Takes a single optional object argument.
-
-_constructor( ?options )_
-
-**Options** > _Object_
-- Options proerties: 
-- **identifier** > _string | symbol - Required_
-- **type** > _BehaviourType - Required_ 
+### EventManager.addContext()
+_Adds a context to an EventManager. Returns the EventManager_
 
 ```javascript
-const behaviourInstance = new Behaviour(
-  { identifier: Symbol('id'), type: 'once' }
-);
+  EventManager.addContext(context: Context);
 ```
+
+### EventManager.removeContext()
+_Removes a context from an EventManager. Returns the EventManager_
+
+```javascript
+  EventManager.removeContext(context: Context | symbol);
+```
+
+### EventManager.fetchContext()
+_fetches a context from an EventManager. Returns a Context or undefined_
+
+```javascript
+  EventManager.removeContext(context: Context | symbol);
+```
+
+### EventManager.broadcast()
+_Triggers a Procedure execution. Returns the EventManager_
+
+The context argument is optional. If ommited, the manager will try triggering the Procedure in all of it's Contexts
+
+```javascript
+  EventManager.broadcast(
+    procedure : Procedure | symbol,
+    context ?: Context | symbol
+  );
+```
+### EventManager.addProcedure()
+_Adds a Procedure to a Context. Returns the EventManager_
+
+```javascript
+  EventManager.addProcedure(
+    procedure : Procedure,
+    context : Context | symbol
+  );
+```
+
+### EventManager.removeProcedure()
+_Removes a Procedure to a Context. Returns the EventManager_
+
+```javascript
+  EventManager.removeProcedure(
+    procedure : Procedure,
+    context : Context | symbol
+  );
+```
+
+## Procedure
+
 
 ### **Behaviour.identifier > _readonly property : symbol_**
 Is the value used to fetch the instance of a behaviour in a container.
 ```javascript
-behaviourInstance.identifier // returns a symbol
 ```
 
 ### **Behaviour.type > _property : BehaviourType_**
