@@ -1,65 +1,73 @@
-import { Behaviour } from '../src/behaviour/behaviour';
-import { Container } from '../src/container/container';
+import { Effect, FlushingStrategies } from '../src/utils/types';
+import { Context } from '../src/context/context';
 import { EventManager } from '../src/manager/manager';
 import { expect } from 'chai';
-import { TeardownStrategies } from '../src/utils/types';
+import { Procedure } from '../src/procedure/procedure';
 
 describe('Manager methods', () => {
-  const myBehaviourIdentifier = Symbol('behaviourID');
-  const myBehaviourType = 'once';
-  const containerIdentifier = Symbol('MyContainerId');
-  const conainerStrategy : TeardownStrategies = 'once';
+  const myProcedureIdentifier = Symbol('behaviourID');
+  const myProcedureType = 'ephemeral';
+  const containerIdentifier = Symbol('MyContextId');
+  const conainerStrategy : FlushingStrategies = 'each-publish';
 
-  let defaultContainer : Container;
-  let devBehaviour : Behaviour;
+  let defaultContext : Context;
+  let devProcedure : Procedure;
   beforeEach(() => {
-    const logFunction = (ev : Behaviour) : void => {
-      console.log(`Behaviour with identifier of ${String(ev.identifier)} has acted!`);
-    };
+    class LoggerEffect implements Effect {
+      public execution (ev : Procedure) : void {
+        console.log(`Procedure with identifier of ${String(ev.identifier)} has acted!`);
+      }
+    }
 
-    devBehaviour = new Behaviour()
-      .withIdentifier(myBehaviourIdentifier)
-      .withType(myBehaviourType)
-      .withAction(logFunction)
+    devProcedure = new Procedure()
+      .withIdentifier(myProcedureIdentifier)
+      .withLifecycle(myProcedureType)
+      .withEffect(new LoggerEffect())
       .build();
 
-    defaultContainer = new Container()
+    defaultContext = new Context()
       .withStrategy(conainerStrategy)
       .withIdentifier(containerIdentifier)
-      .withBehaviours(devBehaviour)
+      .withProcedures(devProcedure)
       .build();
   });
   it('Manager creating and adding works', () => {
     const defaultManager = new EventManager();
 
-    defaultManager.addContainer(defaultContainer);
+    defaultManager.addContext(defaultContext);
 
-    expect(defaultManager.fetchContainer(containerIdentifier)).to.be.deep.equal(defaultContainer);
+    expect(defaultManager.fetchContext(containerIdentifier)).to.be.deep.equal(defaultContext);
   });
   it('Manager broadcasting and removing works', () => {
     const defaultManager = new EventManager();
 
+    class ChangeExecutionState implements Effect {
+      execution () : void {
+        wasExecuted = true;
+      }
+    }
+
     let wasExecuted = false;
-    const anotherBehaviourId = Symbol('anotherId');
-    const anotherBehaviour = new Behaviour()
-      .withIdentifier(anotherBehaviourId)
-      .withType('always')
-      .withAction(() => {wasExecuted = true;})
+    const anotherProcedureId = Symbol('anotherId');
+    const anotherProcedure = new Procedure()
+      .withIdentifier(anotherProcedureId)
+      .withLifecycle('permanent')
+      .withEffect(new ChangeExecutionState)
       .build();
 
-    defaultManager.addContainer(defaultContainer);
-    defaultManager.listen(anotherBehaviour, containerIdentifier);
+    defaultManager.addContext(defaultContext);
+    defaultManager.addProcedure(anotherProcedure, containerIdentifier);
 
-    expect(defaultContainer.getBehaviour(myBehaviourIdentifier)).to.be.deep.equal(devBehaviour);
+    expect(defaultContext.getProcedure(myProcedureIdentifier)).to.be.deep.equal(devProcedure);
 
-    defaultManager.broadcast(anotherBehaviourId);
+    defaultManager.broadcast(anotherProcedureId);
 
-    expect(defaultContainer.getBehaviour(myBehaviourIdentifier)).to.be.undefined;
-    expect(defaultManager.fetchContainer(containerIdentifier)).to.be.deep.equal(defaultContainer);
+    expect(defaultContext.getProcedure(myProcedureIdentifier)).to.be.undefined;
+    expect(defaultManager.fetchContext(containerIdentifier)).to.be.deep.equal(defaultContext);
 
-    defaultManager.removeContainer(containerIdentifier);
+    defaultManager.removeContext(containerIdentifier);
 
-    expect(defaultManager.fetchContainer(containerIdentifier)).to.be.undefined;
+    expect(defaultManager.fetchContext(containerIdentifier)).to.be.undefined;
     expect(wasExecuted).to.be.true;
   });
 });

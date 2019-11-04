@@ -1,16 +1,25 @@
-import { Behaviour } from '../behaviour/behaviour';
-import { Container } from '../container/container';
+import { Context } from '../context/context';
+import { Procedure } from '../procedure/procedure';
 
-export type Action = (event : Behaviour) => void | Promise<void>;
+export abstract class Effect {
+  abstract execution(event : Procedure) : void | Promise<void>;
+};
 
-export type TeardownStrategies = 'all' | 'none' | 'once';
+export type FlushingStrategies = 'no-flush' | 'each-publish';
 
-export type BehaviourType = 'once' | 'always';
+export type ProcedureLifecycle = 'ephemeral' | 'permanent'; // TODO -> Pick better name than ephemeral
 
-export type BehaviourSignature = { identifier : symbol; type : BehaviourType };
+export type ProcedureSignature = { identifier : symbol; lifecycle : ProcedureLifecycle };
 
-export type VoidableBehaviourModifier = (behaviour : Behaviour) => void;
+export type VoidableProcedureModifier = (Procedure : Procedure) => void;
 
-export type VoidableContainerModifier = (container : Container) => void;
+export type VoidableContainerModifier = (container : Context) => void;
 
-export type Identifiable = Behaviour | Container;
+export type Identifiable = Procedure | Context;
+
+export type EventRegistryQuery = {
+  minimumDate ?: Date;
+  maximumDate ?: Date;
+  procedureId ?: symbol;
+  contextId ?: symbol;
+};

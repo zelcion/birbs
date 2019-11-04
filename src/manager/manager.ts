@@ -1,47 +1,49 @@
-import { Behaviour } from '../behaviour/behaviour';
-import { Container } from '../container/container';
+import { Context } from '../context/context';
 import { getIdentifierOf } from '../utils/utils';
+import { Procedure } from '../procedure/procedure';
 
 export class EventManager {
-  private containers : Map<symbol, Container> = new Map();
+  private _contexts : Map<symbol, Context> = new Map();
 
-  public addContainer(container : Container) : EventManager {
-    this.containers.set(container.identifier, container);
+  public addContext(context : Context) : EventManager {
+    this._contexts.set(context.identifier, context);
     return this;
   }
 
-  public removeContainer(container : Container | symbol) : EventManager {
-    this.containers.delete(getIdentifierOf(container));
+  public removeContext(context : Context | symbol) : EventManager {
+    this._contexts.delete(getIdentifierOf(context));
     return this;
   }
 
-  public fetchContainer(containerIdentifier : symbol) : Container {
-    return this.containers.get(containerIdentifier);
+  public fetchContext(contextIdentifier : symbol) : Context | undefined {
+    return this._contexts.get(contextIdentifier);
   }
 
-  public broadcast(behaviour : Behaviour | symbol, container ?: Container | symbol) : EventManager {
-    const chosenContainer = (container !== undefined)?
-      this.containers.get(getIdentifierOf(container)) : undefined;
+  public broadcast(procedure : Procedure | symbol, context ?: Context | symbol) : EventManager {
+    const chosenContext = (context !== undefined)?
+      this._contexts.get(getIdentifierOf(context)) : undefined;
 
-    if (chosenContainer === undefined) {
-      this.containers.forEach(
-        (context) => context.publish(behaviour)
+    if (chosenContext === undefined) {
+      this._contexts.forEach(
+        (selectedContext) => {
+          selectedContext.trigger(procedure);
+        }
       );
 
       return this;
     }
 
-    chosenContainer.publish(behaviour);
+    chosenContext.trigger(procedure);
     return this;
   }
 
-  public listen(behaviour : Behaviour, container : Container | symbol) : EventManager {
-    this.containers.get(getIdentifierOf(container)).sign(behaviour);
+  public addProcedure(procedure : Procedure, context : Context | symbol) : EventManager {
+    this._contexts.get(getIdentifierOf(context)).sign(procedure);
     return this;
   }
 
-  public removeListener(behaviour : Behaviour, container : Container | symbol) : EventManager {
-    this.containers.get(getIdentifierOf(container)).resign(behaviour);
+  public removeProcedure(procedure : Procedure, context : Context | symbol) : EventManager {
+    this._contexts.get(getIdentifierOf(context)).resign(procedure);
     return this;
   }
 
