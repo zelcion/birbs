@@ -428,6 +428,8 @@ Our last entity is the most simple one. It's not even a concrete class. Effect i
 
 If you're working with Javascript, you can write your effect by just placing a method on a class called `execution()`. In typescript, import it and have your Effect `implements` it.
 
+An important thing to notice is that it is possible to have multiple Effects in a Procedure, and if that is the case, they are all executed in parallel.
+
 ### Effect's execution interface:
 The method recieves one parameter that is the Procedure it belongs, and has the context that its Procedure was triggered bound to it. This means that we have a single argument and when we type `this`, we are reffering to a context.
 
@@ -443,11 +445,12 @@ execution(procedure : Procedure) {
 Hey! You got till the end!
 I hope you liked this package and it's being useful for you. Now let's check what is next!
 
-- ## v0.5
+- **v0.5**
   - Have more reliable tests;
-  - More strict entity checks to avoid unexpected states.
-  - Have a short builder that accepts an object with the options.
-- ## v0.6
+  - More strict entity checks to avoid unexpected states;
+  - Have a short builder that accepts an object with the options;
+  - Also accept strings in the `.withIdentifier()` clauses;
+- **v0.6**
   - Add Pipeline Entity (Sequential effects);
   
 You are very welcome to contribute to this list! just head to the [gitHub Page](https://github.com/flgmjr/birbs/issues/new)!
