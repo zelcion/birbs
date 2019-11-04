@@ -26,14 +26,14 @@ export class EventManager {
     if (chosenContext === undefined) {
       this._contexts.forEach(
         (selectedContext) => {
-          selectedContext.publish(procedure);
+          selectedContext.trigger(procedure);
         }
       );
 
       return this;
     }
 
-    chosenContext.publish(procedure);
+    chosenContext.trigger(procedure);
     return this;
   }
 

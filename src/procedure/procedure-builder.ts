@@ -15,10 +15,6 @@ export class ProcedureBuilder {
   protected _lifecycle : ProcedureLifecycle;
   protected _effects : Effect[] = [];
 
-  public get effects () : Effect[] {
-    return this._effects;
-  }
-
   public build <T extends Procedure>(this : T) : T{
     throwTargetAlreadyBuilt(this._modifiers);
 
@@ -44,7 +40,7 @@ export class ProcedureBuilder {
     return this;
   }
 
-  public withType <T extends Procedure>(this : T, lifecycle : ProcedureLifecycle) : T {
+  public withLifecycle <T extends Procedure>(this : T, lifecycle : ProcedureLifecycle) : T {
     throwTargetAlreadyBuilt(this._modifiers);
     throwInvalidProcedureLifecycle(lifecycle);
 

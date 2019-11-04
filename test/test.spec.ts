@@ -22,7 +22,7 @@ describe('Birbs API', () => {
       const TestProcedureId = Symbol('test');
       const TestProcedureInstance = new TestProcedure()
         .withIdentifier(TestProcedureId)
-        .withType('permanent');
+        .withLifecycle('permanent');
 
       const builder = () : void => {
         TestProcedureInstance.build();
@@ -40,7 +40,7 @@ describe('Birbs API', () => {
       const procedureId = Symbol('Procedure');
       const TestProcedureInstance = new TestProcedure()
         .withIdentifier(procedureId)
-        .withType('permanent')
+        .withLifecycle('permanent')
         .withEffect(new TestEffect()).build();
 
       const contextId = Symbol('Context');

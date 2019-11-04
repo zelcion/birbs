@@ -21,7 +21,7 @@ describe('Manager methods', () => {
 
     devProcedure = new Procedure()
       .withIdentifier(myProcedureIdentifier)
-      .withType(myProcedureType)
+      .withLifecycle(myProcedureType)
       .withEffect(new LoggerEffect())
       .build();
 
@@ -51,7 +51,7 @@ describe('Manager methods', () => {
     const anotherProcedureId = Symbol('anotherId');
     const anotherProcedure = new Procedure()
       .withIdentifier(anotherProcedureId)
-      .withType('permanent')
+      .withLifecycle('permanent')
       .withEffect(new ChangeExecutionState)
       .build();
 

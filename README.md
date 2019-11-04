@@ -194,7 +194,7 @@ For the sake of simplicity, we will not create all the servers and routes, just 
 
        // You will need a reference to the
        // id of your procedure when executing it.
-       this.publish(notificationId);
+       this.trigger(notificationId);
    }
    ```
 
@@ -282,84 +282,170 @@ _Removes a Procedure to a Context. Returns the EventManager_
   );
 ```
 
+## Context
+Context is the entity that holds the data that defines a domain in you application, or is the domain itself. For example, our `MeatDepartment` would need the available meat cuts and the clients we're serving.
+
+The Context can be accessed in the Effect by using the `this` keyword.
+
+Contexts have a special mechanics which is the FlushStrategy. Whenever the Context triggers a Procedure, it needs to be either discarded (if the procedure is 'ephemeral'), or maintained (if it is 'permanent'). The FlushStrategy is set to choose whether to discard all ephemeral Procedures when any Procedure of it is triggered or to not discard any. The logic goes like the following:
+
+| Procedure Type | Context Strategy | Result                                    |
+|----------------|------------------|-------------------------------------------|
+| "ephemeral"    | "no-flush"       | Only the triggered Procedure is discarded |
+| "ephemeral"    | "each-trigger"   | All "ephemeral" Procedures are discarded  |
+| "permanent"    | "no-flush"       | No Procedures discarded                   |
+| "permanent"    | "each-trigger"   | All "ephemeral" Procedures are discarded  |
+
+Triggered "ephemeral" Procedures are always discarded, while "permanent" are never discarded.
+
+Contexts need to be built to use. Here we will cover the building methods.
+
+### ContextBuilder.withIdentifier()
+_Adds the identifier to the context that is to be built._
+_Returns the ContextBuilder._
+This is required to build the context.
+
+```javascript
+  ContextBuilder.withIdentifier(identifier: symbol);
+```
+
+### ContextBuilder.withProcedures()
+_Adds procedures to the context that is to be built._
+_Returns the ContextBuilder._
+
+```javascript
+  ContextBuilder.withProcedures(procedure: Procedure | Procedure[]);
+```
+
+### ContextBuilder.withStrategy()
+_Sets the flushing strategy of the context that is to be built._
+_Returns the ContextBuilder._
+this is required to build the Context.
+
+```javascript
+  ContextBuilder.withProcedures(procedure: Procedure | Procedure[]);
+```
+
+### ContextBuilder.build()
+_Apply all modifications added and returns the built context._
+
+```javascript
+  ContextBuilder.build();
+```
+
+### Context.sign()
+_Signs a procedure in the context. Returns the context_
+
+```javascript
+  Context.sign(procedure: Procedure);
+```
+
+### Context.resign()
+_Resigns/Removes a procedure from the context. Returns the context_
+
+```javascript
+  Context.resign(procedure: Procedure);
+```
+
+### Context.getProcedure()
+_Fetches a procedure by it's Identifier. Returns a procedure or undefined_
+
+```javascript
+  Context.getProcedure(procedureId: symbol);
+```
+
+### Context.hasProcedure()
+_Checks if the context has a procedure. Returns a boolean_
+
+```javascript
+  Context.hasProcedure(procedureId: symbol | Procedure);
+```
+
+### Context.flushingStrategy > _getter_
+_Gets the context's flushing strategy_
+
+### Context.identifier > _getter_
+_Gets the context's identifier_
+
+### Context.identifierName > _getter_
+_Gets the string of a context's identifier_
+
 ## Procedure
+Procedure is the entity that encapsulates or groups a set of informations and fields regarding an action that your application takes. For example, throwing an especific error could be a valid procedure, Logging out an user could be one as well.
 
+Procedures has an important property "Lifecycle", which sets the execution type of it. If you set it to `ephemeral`, the procedure can be executed only once per sign (when it's signed in a context). If you set it to `permanent`, it will stay there until resigned.
 
-### **Behaviour.identifier > _readonly property : symbol_**
-Is the value used to fetch the instance of a behaviour in a container.
+Procedures also have a builder.
+
+### ProcedureBuilder.withIdentifier()
+_Adds the identifier to the procedure that is to be built._
+_Returns the ProcedureBuilder._
+This is required to build the Procedure
+
 ```javascript
+  procedureBuilder.withIdentifier(identifier: symbol);
 ```
 
-### **Behaviour.type > _property : BehaviourType_**
-Is the type used to check if the listener of this behaviour will be flushed or not, according to it's container flushing strategy.
+### ProcedureBuilder.withType()
+_Sets the type of the procedure that is to be built._
+_Returns the ProcedureBuilder._
+This is required to build the Procedure
 
-Can have the values of: `'once'` or `'always'`.
+type can be either "ephemeral" or "permanent".
 
-`once` Behaviours need to be signed again each time the Container flushes or they are fired. `always` Behaviours, on the other hand, can be used indefinitely or until they are flushed.
-  
 ```javascript
-behaviourInstance.type // returns a string, either 'once' or 'always'
+  procedureBuilder.withType(type: string);
 ```
 
-### **Behaviour.actions > _property : Map( symbol, Action )_**
-Is where there are stored the callbacks called when the event is fired
+### ProcedureBuilder.withEffect()
+_Adds an Effect to the procedure that is to be built._
+_Returns the ProcedureBuilder._
+This is required to build the Procedure
+
 ```javascript
-behaviourInstance.actions // returns a Map(symbol, Action)
+  procedureBuilder.withEffect(effect: Effect);
 ```
 
-### **Behaviour.bindAction( ) > _method : this_**
-This method sets a key-value entry in this behaviour's actions.
-
-Arguments:
-- **action** > _Action - Required_ 
-- **name** > _symbol | string - Required_
+### ProcedureBuilder.build()
+_Apply all modifications added and returns the built procedure._
 
 ```javascript
-behaviour.bindAction(action, name); //returns `this`
+  ProcedureBuilder.build();
 ```
 
-### **Behaviour.Act( ) > _method : this_**
-This method fires all the actions of a Behavior. This is not intended to use manually.
+### Procedure.lifecycle > _getter_
+_gets the procedure's lifecycle type._
 
-Arguments:
-- **action** > _Action - Required_ 
-- **name** > _symbol | string - Required_
+### Procedure.effects > _getter_
+_gets the procedure's effects (Array)_
+
+### Procedure.identifier > _getter_
+_gets the procedure's identifier_
+
+## Effect
+Our last entity is the most simple one. It's not even a concrete class. Effect is the representation of a part of a Procedure. We called it Effect since we're working with events here, it's the _Effect_ of a Procedure happening in your application.
+
+If you're working with Javascript, you can write your effect by just placing a method on a class called `execution()`. In typescript, import it and have your Effect `implements` it.
+
+### Effect's execution interface:
+The method recieves one parameter that is the Procedure it belongs, and has the context that its Procedure was triggered bound to it. This means that we have a single argument and when we type `this`, we are reffering to a context.
 
 ```javascript
-behaviour.bindAction(action, name);
-```
-
-## Action > _Typeof Function_
-The type of the funtions or methods that are accepted to be added to Behaviours.
-
-_**function**( behaviour ) => void_
-- **behaviour** > _Behaviour_
-```javascript
-const testAction = (behaviour) => { // is Action-compliant
-  // do something
+execution(procedure : Procedure) {
+  console.log(procedure) // Logs the procedure
+  console.log(this) // Logs the context
 }
 ```
 
-## Container > _Class_
-Containers in Birbs are the unit that encapsulates the events and give them context. Different from the Behaviour, this class is not supposed to be extended.
+-------
+# Roadmap
+Hey! You got till the end!
+I hope you liked this package and it's being useful for you. Now let's check what is next!
 
-Containers have the ability to also reset their state with different strategies, the so called `flushStrategies`, and they contain a set of methods to manipulate and fire Behaviours (But for consistency, prefer using the [EventManager](https://www.npmjs.com/package/birbs#event-manager)).
-
-### **Class Constructor**
-_constructor( identifier, type )_
-
-- **identifier** > _symbol | string - Required_
-- **type** > _('once' | 'always' | 'never') - Required_
-
-```javascript
-const containerInstance = new Container(
-  Symbol('identifier'),
-  'once'
-);
-```
-
-###  **Container.identifier > _private readonly property : symbol_**
-This property is private and has a public getter. It is equivalent to `Behaviour.identifier`.
-
-### **Container.emitter > _private readonly property : EventEmitter_**
-The extension of node's native emitter. This is private and should never be from outside Birbs' interface.
+- ## v0.5
+  - Have more reliable tests;
+  - More strict entity checks to avoid unexpected states.
+- ## v0.6
+  - Add Pipeline Entity (Sequential effects);
+  
+You are very welcome to contribute to this list! just head to the [gitHub Page]()!

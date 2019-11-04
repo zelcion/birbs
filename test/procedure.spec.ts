@@ -10,7 +10,7 @@ describe('Procedure methods', () => {
 
     const dev = new Procedure()
       .withIdentifier(myIdentifier)
-      .withType(myType)
+      .withLifecycle(myType)
       .build();
 
     expect(dev.identifier).to.be.equal(myIdentifier);
@@ -39,7 +39,7 @@ describe('Procedure methods', () => {
 
     const dev = new CustomImplementation('1234abcd')
       .withIdentifier(myIdentifier)
-      .withType(myType)
+      .withLifecycle(myType)
       .withEffect(new CustomEffect())
       .build();
 
@@ -50,7 +50,7 @@ describe('Procedure methods', () => {
       .withStrategy('no-flush')
       .build();
 
-    customContext.publish(myIdentifier);
+    customContext.trigger(myIdentifier);
     expect(dev.isTropical).to.be.equal(true);
   });
 });

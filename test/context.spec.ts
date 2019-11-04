@@ -16,7 +16,7 @@ describe('context methods', () => {
 
     devProcedure = new Procedure()
       .withIdentifier(myProcedureIdentifier)
-      .withType(myProcedureType)
+      .withLifecycle(myProcedureType)
       .withEffect(new LoggerEffect())
       .build();
   });
@@ -51,7 +51,7 @@ describe('context methods', () => {
     const anotherProcedureId = Symbol('anotherId');
     const anotherProcedure = new Procedure()
       .withIdentifier(anotherProcedureId)
-      .withType('permanent')
+      .withLifecycle('permanent')
       .withEffect(myEffect)
       .build();
 
@@ -67,12 +67,12 @@ describe('context methods', () => {
 
     expect(context.hasProcedure(myProcedureIdentifier)).to.be.true;
 
-    context.publish(myProcedureIdentifier);
+    context.trigger(myProcedureIdentifier);
     expect(context.hasProcedure(myProcedureIdentifier)).to.be.false;
     expect(wasExecuted).to.be.false;
     expect(context.hasProcedure(anotherProcedureId)).to.be.true;
 
-    context.publish(anotherProcedureId);
+    context.trigger(anotherProcedureId);
     expect(context.hasProcedure(myProcedureIdentifier)).to.be.false;
 
     expect(wasExecuted).to.be.true;

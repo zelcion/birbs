@@ -1,6 +1,6 @@
+import { Effect, ProcedureLifecycle } from '../utils/types';
 import { Context } from '../context/context';
 import { ProcedureBuilder } from './procedure-builder';
-import { ProcedureLifecycle } from '../utils/types';
 
 export class Procedure extends ProcedureBuilder{
   public get identifier() : symbol {
@@ -13,10 +13,16 @@ export class Procedure extends ProcedureBuilder{
 
   public constructor () {
     super();
-    this.Act = this.Act.bind(this);
+    this.Run = this.Run.bind(this);
   }
 
-  public async Act(context : Context) : Promise<void> {
+  public get effects () : Effect[] {
+    return this._effects;
+  }
+
+  public async Run(context : Context) : Promise<void> {
+    if (context === undefined) throw TypeError('This method needs to be called from a context.');
+
     const executionCompletion = [];
     this._effects.forEach((effect) => {
       const exec = effect.execution.bind(context);

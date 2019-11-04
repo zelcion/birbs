@@ -22,7 +22,7 @@ export class Context extends ContextBuilder{
     return this._identifier;
   }
 
-  public publish(procedure : Procedure | symbol) : void {
+  public trigger(procedure : Procedure | symbol) : void {
     throwNoProceduresRegistered(this._procedures);
 
     const procedureToBeEmitted : Procedure = (typeof procedure === 'symbol')?
@@ -72,11 +72,11 @@ export class Context extends ContextBuilder{
     this._procedures.set(procedure.identifier, procedure);
 
     if (procedure.lifecycle === 'permanent') {
-      this._emitter.on(procedure.identifier, procedure.Act);
+      this._emitter.on(procedure.identifier, procedure.Run);
       return;
     }
 
-    this._emitter.once(procedure.identifier, procedure.Act);
+    this._emitter.once(procedure.identifier, procedure.Run);
     return;
   }
 
@@ -114,5 +114,5 @@ export class Context extends ContextBuilder{
     return this._procedures.has(getIdentifierOf(procedure));
   }
 
-  // Add Actions to Procedures [By Symbol or By itself]
+  // Add Runions to Procedures [By Symbol or By itself]
 };
