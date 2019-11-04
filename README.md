@@ -22,7 +22,7 @@ Capture and admire all your joyful events with this event manager and encapsulat
 
 ## What is Birbs? Why Birbs?
 
-Birbs is an Event encapsulator that gives context and extensibility to Node's plain events. It's objective is to bring the marvels of encapsulation and polymorphism of OOP into the world of Events, and doing that in a easily pluggable fashion!
+Birbs is an Event encapsulator that gives context and extensibility to Node's plain events. Its objective is to bring the marvels of encapsulation and polymorphism of OOP into the world of Events, and doing that in a easily pluggable fashion!
 
 By encapsulating your application's events, it is possible to control all the flow of your application and decouple many parts of it, allowing you to reuse your routines and procedures and make them have different impacts depending on the context they're in. Let's say for example you have a Super Market application. There you have a `MeatDepartment` domain and a `FruitDepartment` domain. For theese both you need a function or method called `getWeight()`. With birbs it is possible to have a `Procedure` with this name, and use it to either weight Meat or Fruits!
 
@@ -222,7 +222,7 @@ For the sake of simplicity, we will not create all the servers and routes, just 
 
 Before everything, let's talk about our names. In birbs there are four important names for you to know: `EventManager`, `Context`, `Procedure`, and `Effect`. EventManager is the easier one to understand, it's the entity that you can use to broadcast an event to a context withoutt having any reference to neither, just their Ids.
 
-Now for the other three, it is better to first understand their relation. Contexts have Procedures to use or execute in it's lifetime. Procedures each have at least one Effect to be triggered when needed. Context don't know about Effects, but Effects have direct references to the context that triggered their procedure. When a procedure is used, the control is passed from the context, to the procedure, into the effect.
+Now for the other three, it is better to first understand their relation. Contexts have Procedures to use or execute in its lifetime. Procedures each have at least one Effect to be triggered when needed. Context don't know about Effects, but Effects have direct references to the context that triggered their procedure. When a procedure is used, the control is passed from the context, to the procedure, into the effect.
 
 #### Notes:
 - Birbs has native support for typescript.
@@ -255,7 +255,7 @@ _fetches a context from an EventManager. Returns a Context or undefined_
 ### EventManager.broadcast()
 _Triggers a Procedure execution. Returns the EventManager_
 
-The context argument is optional. If ommited, the manager will try triggering the Procedure in all of it's Contexts
+The context argument is optional. If ommited, the manager will try triggering the Procedure in all of its Contexts
 
 ```javascript
   EventManager.broadcast(
@@ -349,7 +349,7 @@ _Resigns/Removes a procedure from the context. Returns the context_
 ```
 
 ### Context.getProcedure()
-_Fetches a procedure by it's Identifier. Returns a procedure or undefined_
+_Fetches a procedure by its Identifier. Returns a procedure or undefined_
 
 ```javascript
   Context.getProcedure(procedureId: symbol);
@@ -446,6 +446,7 @@ I hope you liked this package and it's being useful for you. Now let's check wha
 - ## v0.5
   - Have more reliable tests;
   - More strict entity checks to avoid unexpected states.
+  - Have a short builder that accepts an object with the options.
 - ## v0.6
   - Add Pipeline Entity (Sequential effects);
   
