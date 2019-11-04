@@ -13,11 +13,14 @@ Capture and admire all your joyful events with this event manager and encapsulat
 
 ------------------
 ## Table of Contents
-- [Why Birbs?](https://www.npmjs.com/package/birbs#what-is-birbs-why-birbs)
-- [How to Install](https://www.npmjs.com/package/birbs#how-to-install)
-- [How to Use (quick guide)](https://www.npmjs.com/package/birbs#how-to-use-it)
-- [API Reference](https://www.npmjs.com/package/birbs#api-reference)
--  - [Behaviour](https://www.npmjs.com/package/birbs#behaviour)
+- [Why Birbs?](https://github.com/flgmjr/birbs#what-is-birbs-why-birbs)
+- [Examples](https://github.com/flgmjr/birbs#example-chat-application-js)
+- [API Reference](https://github.com/flgmjr/birbs#api-reference)
+  - [EventManager](https://github.com/flgmjr/birbs#eventmanager)
+  - [Context](https://github.com/flgmjr/birbs#context)
+  - [Procedure](https://github.com/flgmjr/birbs#procedure)
+  - [Effect](https://github.com/flgmjr/birbs#effect)
+- [Roadmap](https://github.com/flgmjr/birbs#roadmap)
 
 ## What is Birbs? Why Birbs?
 
