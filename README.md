@@ -22,7 +22,7 @@ Capture and admire all your joyful events with this event manager and encapsulat
 
 ## What is Birbs? Why Birbs?
 
-Birbs is an Event encapsulator that gives context and extensibility to Node's plain events. Its objective is to bring the marvels of encapsulation and polymorphism of OOP into the world of Events, and doing that in a easily pluggable fashion!
+Birbs is an Event encapsulator that gives context and extensibility to Node's plain events. Its objective is to bring the marvels of encapsulation and polymorphism of OOP into the world of Events, and doing that in an easily pluggable fashion!
 
 By encapsulating your application's events, it is possible to control all the flow of your application and decouple many parts of it, allowing you to reuse your routines and procedures and make them have different impacts depending on the context they're in. Let's say for example you have a Super Market application. There you have a `MeatDepartment` domain and a `FruitDepartment` domain. For theese both you need a function or method called `getWeight()`. With birbs it is possible to have a `Procedure` with this name, and use it to either weight Meat or Fruits!
 
@@ -163,7 +163,7 @@ For the sake of simplicity, we will not create all the servers and routes, just 
    const notificationId = Symbol('notification');
    const notifyNewMessages = new NotificationProcedure('New message received!')
      .withIdentifier(notificationId)
-     .withType('permanent')
+     .withLifecycle('permanent')
      .withEffect(new NotifyNewMessage())
      .build()
 
@@ -387,7 +387,7 @@ This is required to build the Procedure
   procedureBuilder.withIdentifier(identifier: symbol);
 ```
 
-### ProcedureBuilder.withType()
+### ProcedureBuilder.withLifecycle()
 _Sets the type of the procedure that is to be built._
 _Returns the ProcedureBuilder._
 This is required to build the Procedure
@@ -395,7 +395,7 @@ This is required to build the Procedure
 type can be either "ephemeral" or "permanent".
 
 ```javascript
-  procedureBuilder.withType(type: string);
+  procedureBuilder.withLifecycle(type: string);
 ```
 
 ### ProcedureBuilder.withEffect()
