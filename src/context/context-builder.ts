@@ -1,4 +1,4 @@
-import { FlushingStrategies, VoidableContainerModifier } from '../utils/types';
+import { ContextOptions, FlushingStrategies, VoidableContainerModifier } from '../utils/types';
 import { setSymbol, throwStrategyInvalid } from '../utils/utils';
 import { throwNoFlushingStrategy, throwNoIdentifier, throwTargetAlreadyBuilt } from '../utils/error-handler';
 import { Context } from './context';
@@ -10,12 +10,14 @@ export class ContextBuilder {
   protected _procedures : Map<symbol, Procedure> = new Map();
   protected _flushingStrategy : FlushingStrategies;
 
-  public build<T extends Context>(this : T) : T {
+  public build<T extends Context>(this : T, options ?: ContextOptions) : T {
     throwTargetAlreadyBuilt(this._modifiers);
 
     this._modifiers.forEach((modifier) => {
       modifier(this);
     });
+
+    if (options !== undefined) this._applyOptions(options);
 
     throwNoFlushingStrategy(this);
     throwNoIdentifier(this);
@@ -23,6 +25,16 @@ export class ContextBuilder {
 
     return this;
   };
+
+  private _applyOptions <T extends Context>(this : T, options :  ContextOptions) : void {
+    if (options.identifier !== undefined) {
+      this._identifier = setSymbol(options.identifier);
+    }
+
+    if (options.strategy !== undefined) {
+      this._flushingStrategy = options.strategy;
+    }
+  }
 
   public withIdentifier<T extends Context>(this : T, identifier : symbol | string) : T {
     throwTargetAlreadyBuilt(this._modifiers);

@@ -5,6 +5,8 @@ export abstract class Effect {
   abstract execution(event : Procedure) : void | Promise<void>;
 };
 
+export type Execution<T> = (procedure : T) => void;
+
 export type FlushingStrategies = 'no-flush' | 'each-publish';
 
 export type ProcedureLifecycle = 'ephemeral' | 'permanent'; // TODO -> Pick better name than ephemeral
@@ -22,4 +24,15 @@ export type EventRegistryQuery = {
   maximumDate ?: Date;
   procedureId ?: symbol;
   contextId ?: symbol;
+};
+
+export type ContextOptions = {
+  identifier ?: symbol | string;
+  strategy ?: FlushingStrategies;
+};
+
+export type ProcedureOptions = {
+  identifier ?: symbol | string;
+  lifecycle ?: ProcedureLifecycle;
+  effects ?: Effect[];
 };

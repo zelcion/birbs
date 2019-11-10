@@ -2,6 +2,7 @@ import { Context } from '../src/context/context';
 import { Effect } from '../src/utils/types';
 import { expect } from 'chai';
 import { Procedure } from '../src/procedure/procedure';
+import { toNewEffect } from '../src/utils/utils';
 
 describe('Birbs API', () => {
   class TestProcedure extends Procedure {
@@ -65,5 +66,29 @@ describe('Birbs API', () => {
 
       expect(builder).to.not.throw();
     });
+  });
+
+  it('Effect Maker', async (done) => {
+    function logggyyyy (this : TestContext) : void {
+      expect(this.testConstant).to.be.equal('bar');
+      done();
+    };
+
+    const procedure = new TestProcedure()
+      .build({
+        effects: [toNewEffect(logggyyyy)],
+        identifier: 'name',
+        lifecycle: 'permanent'
+      });
+
+    const context = new TestContext()
+      .build({
+        identifier: 'context',
+        strategy: 'no-flush'
+      });
+
+    context.sign(procedure);
+
+    context.trigger(procedure);
   });
 });

@@ -1,4 +1,5 @@
-import { FlushingStrategies, Identifiable, ProcedureLifecycle } from './types';
+import { Effect, Execution, FlushingStrategies, Identifiable, ProcedureLifecycle } from './types';
+import { Procedure } from '../procedure/procedure';
 
 export const setSymbol = (entry : symbol | string) : symbol => {
   let result : symbol;
@@ -31,4 +32,26 @@ export const throwStrategyInvalid = (type : FlushingStrategies) : void => {
   if(type !== 'each-publish' && type !== 'no-flush') {
     throw TypeError('Unrecognized type in builder! Type must be "each-publish", or "no-flush"!');
   }
+};
+
+export const toNewEffect = <T extends Procedure>(execution : Execution<T>) : Effect => {
+  if (typeof execution !== 'function') {
+    throw TypeError('The argument is not a function.');
+  }
+
+  class StandardEffect implements Effect {
+    private _boundExecution : Execution<T>;
+
+    constructor (exec : Execution<T>) {
+      this.execution = exec;
+    }
+    execution(event : T) : void {
+      console.log(event, 'you probably forgot to pass in a function here.');
+      throw TypeError('missing function on the argument');
+    }
+  }
+
+  const result = new StandardEffect(execution);
+
+  return result;
 };

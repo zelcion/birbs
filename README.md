@@ -306,8 +306,10 @@ _Adds the identifier to the context that is to be built._
 _Returns the ContextBuilder._
 This is required to build the context.
 
+You can either create the symbol and use it in this modifier or input a string and retrieve the synbol of it later with `.identifier`.
+
 ```javascript
-  ContextBuilder.withIdentifier(identifier: symbol);
+  ContextBuilder.withIdentifier(identifier: symbol | string) ;
 ```
 
 ### ContextBuilder.withProcedures()
@@ -383,8 +385,9 @@ _Adds the identifier to the procedure that is to be built._
 _Returns the ProcedureBuilder._
 This is required to build the Procedure
 
+You can either create the symbol and use it in this modifier or input a string and retrieve the synbol of it later with `.identifier`.
 ```javascript
-  procedureBuilder.withIdentifier(identifier: symbol);
+  procedureBuilder.withIdentifier(identifier: symbol | string);
 ```
 
 ### ProcedureBuilder.withLifecycle()
@@ -441,16 +444,19 @@ execution(procedure : Procedure) {
 ```
 
 -------
-# Roadmap
+# Roadmap / Changelog
 Hey! You got till the end!
 I hope you liked this package and it's being useful for you. Now let's check what is next!
 
 - **v0.5**
   - Have more reliable tests;
   - More strict entity checks to avoid unexpected states;
-  - Have a short builder that accepts an object with the options;
-  - Also accept strings in the `.withIdentifier()` clauses;
+  - ~~Have a short builder that accepts an object with the options~~;
+  - ~~Also accept strings in the `.withIdentifier()` clauses~~;
+  - ~~Have a helper function that makes a method or function into an Effect~~; Now test it and add it to the documentation.
 - **v0.6**
   - Add Pipeline Entity (Sequential effects);
+- **v0.7**
+  - Add Event History;
   
 You are very welcome to contribute to this list! just head to the [gitHub Page](https://github.com/flgmjr/birbs/issues/new)!

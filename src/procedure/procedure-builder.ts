@@ -1,4 +1,4 @@
-import { Effect, ProcedureLifecycle, VoidableProcedureModifier } from '../utils/types';
+import { Effect, ProcedureLifecycle, ProcedureOptions, VoidableProcedureModifier } from '../utils/types';
 import { setSymbol, throwInvalidProcedureLifecycle } from '../utils/utils';
 import {
   throwMethodNotPresent,
@@ -15,12 +15,14 @@ export class ProcedureBuilder {
   protected _lifecycle : ProcedureLifecycle;
   protected _effects : Effect[] = [];
 
-  public build <T extends Procedure>(this : T) : T{
+  public build <T extends Procedure>(this : T, options ?: ProcedureOptions) : T{
     throwTargetAlreadyBuilt(this._modifiers);
 
     this._modifiers.forEach((modifier) => {
       modifier(this);
     });
+
+    if (options !== undefined) this._applyOptions(options);
 
     throwNoEffects(this);
     throwNoIdentifier(this);
@@ -28,6 +30,20 @@ export class ProcedureBuilder {
     this._modifiers = null;
     return this;
   };
+
+  private _applyOptions <T extends Procedure>(this : T, options : ProcedureOptions) : void {
+    if (options.effects !== undefined && Array.isArray(options.effects)) {
+      this._effects = options.effects;
+    }
+
+    if (options.identifier !== undefined) {
+      this._identifier = setSymbol(options.identifier);
+    }
+
+    if (options.lifecycle !== undefined) {
+      this._lifecycle = options.lifecycle;
+    }
+  }
 
   public withIdentifier <T extends Procedure>(this : T, identifier : symbol | string) : T {
     throwTargetAlreadyBuilt(this._modifiers);
