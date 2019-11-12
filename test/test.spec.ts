@@ -68,7 +68,7 @@ describe('Birbs API', () => {
     });
   });
 
-  it('Effect Maker', async (done) => {
+  it('Effect Maker and lazy builder', async (done) => {
     function logggyyyy (this : TestContext) : void {
       expect(this.testConstant).to.be.equal('bar');
       done();

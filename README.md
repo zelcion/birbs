@@ -332,6 +332,14 @@ this is required to build the Context.
 ### ContextBuilder.build()
 _Apply all modifications added and returns the built context._
 
+This builder method also accepts an optional argument that can be used as a "lazy" builder. You can input it with an object with the following parameters (all optional):
+```javascript
+{
+  identifier : symbol | string,
+  strategy : string
+}
+```
+The lazy builder has priority when using alongside the normal builder. This means that if there is an `identifier` already set with modifications, it will be overriten by the lazy builder's `identifier`.
 ```javascript
   ContextBuilder.build();
 ```
@@ -413,6 +421,16 @@ This is required to build the Procedure
 ### ProcedureBuilder.build()
 _Apply all modifications added and returns the built procedure._
 
+This builder method also accepts an optional argument that can be used as a "lazy" builder. You can input it with an object with the following parameters (all optional):
+```javascript
+{
+  identifier : symbol | string,
+  lifecycle : string,
+  effects : Effect[],
+}
+```
+The lazy builder has priority when using alongside the normal builder. This means that if there is an `identifier` already set with modifications, it will be overriten by the lazy builder's `identifier`.
+
 ```javascript
   ProcedureBuilder.build();
 ```
@@ -429,7 +447,9 @@ _gets the procedure's identifier_
 ## Effect
 Our last entity is the most simple one. It's not even a concrete class. Effect is the representation of a part of a Procedure. We called it Effect since we're working with events here, it's the _Effect_ of a Procedure happening in your application.
 
-If you're working with Javascript, you can write your effect by just placing a method on a class called `execution()`. In typescript, import it and have your Effect `implements` it.
+If you're working with Javascript, you can write your effect by just placing a method on a class or object called `execution()`. In typescript, import it and have your Effect `implements` it.
+
+`execution()` Must be unbound.
 
 An important thing to notice is that it is possible to have multiple Effects in a Procedure, and if that is the case, they are all executed in parallel.
 
@@ -443,6 +463,27 @@ execution(procedure : Procedure) {
 }
 ```
 
+## Utils
+We have packaged some helper functions for you to use with birbs. Here's their examples and references.
+
+### `utils.toNewEffect()`
+_Creates an Effect from the function input. and returns it_
+
+This function accepts a single argument, which is another function or a callback which you want to turn into an Effect. Keep in mnind that using this function is not recommended when building new applications, it shines the most when used in mature applications to start implementing birbs to its full potential.
+
+The argument must be an unbound function.
+
+```javascript
+import { utils } from 'birbs';
+
+function hello (procedure) {
+  console.log(`hello ${procedure.name}`);
+};
+
+const helloEffect = utils.toNewEffect(hello);
+// helloEffect now can be used in ".withEffect()"
+```
+
 -------
 # Roadmap / Changelog
 Hey! You got till the end!
@@ -450,10 +491,10 @@ I hope you liked this package and it's being useful for you. Now let's check wha
 
 - **v0.5**
   - Have more reliable tests;
-  - More strict entity checks to avoid unexpected states;
+  - ~~More strict entity checks to avoid unexpected states~~;
   - ~~Have a short builder that accepts an object with the options~~;
   - ~~Also accept strings in the `.withIdentifier()` clauses~~;
-  - ~~Have a helper function that makes a method or function into an Effect~~; Now test it and add it to the documentation.
+  - ~~Have a helper function that makes a method or function into an Effect~~;
 - **v0.6**
   - Add Pipeline Entity (Sequential effects);
 - **v0.7**

@@ -5,7 +5,7 @@ export abstract class Effect {
   abstract execution(event : Procedure) : void | Promise<void>;
 };
 
-export type Execution<T> = (procedure : T) => void;
+export type Execution<T, Y> = (this : Y, procedure : T) => void;
 
 export type FlushingStrategies = 'no-flush' | 'each-publish';
 

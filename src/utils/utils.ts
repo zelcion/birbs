@@ -1,4 +1,5 @@
 import { Effect, Execution, FlushingStrategies, Identifiable, ProcedureLifecycle } from './types';
+import { Context } from '../context/context';
 import { Procedure } from '../procedure/procedure';
 
 export const setSymbol = (entry : symbol | string) : symbol => {
@@ -34,15 +35,15 @@ export const throwStrategyInvalid = (type : FlushingStrategies) : void => {
   }
 };
 
-export const toNewEffect = <T extends Procedure>(execution : Execution<T>) : Effect => {
+export const toNewEffect = <T extends Procedure, Y extends Context>(execution : Execution<T, Y>) : Effect => {
   if (typeof execution !== 'function') {
     throw TypeError('The argument is not a function.');
   }
 
   class StandardEffect implements Effect {
-    private _boundExecution : Execution<T>;
+    private _boundExecution : Execution<T, Y>;
 
-    constructor (exec : Execution<T>) {
+    constructor (exec : Execution<T, Y>) {
       this.execution = exec;
     }
     execution(event : T) : void {
