@@ -2,12 +2,14 @@ import { ContextOptions, FlushingStrategies, VoidableContainerModifier } from '.
 import { setSymbol, throwStrategyInvalid } from '../utils/utils';
 import { throwNoFlushingStrategy, throwNoIdentifier, throwTargetAlreadyBuilt } from '../utils/error-handler';
 import { Context } from './context';
+import { EventEmitter } from 'events';
 import { Procedure } from '../procedure/procedure';
 
 export class ContextBuilder {
   private _modifiers : VoidableContainerModifier[] | null = [];
+  protected _emitter : EventEmitter = new EventEmitter;
   protected _identifier : symbol;
-  protected _procedures : Map<symbol, Procedure> = new Map();
+  public _procedures : Map<symbol, Procedure> = new Map();
   protected _flushingStrategy : FlushingStrategies;
 
   public build<T extends Context>(this : T, options ?: ContextOptions) : T {

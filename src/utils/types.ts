@@ -1,8 +1,8 @@
 import { Context } from '../context/context';
 import { Procedure } from '../procedure/procedure';
 
-export abstract class Effect {
-  abstract execution(event : Procedure) : void | Promise<void>;
+export interface Effect {
+  execution(event : Procedure) : void | Promise<void>;
 };
 
 export type Execution<T, Y> = (this : Y, procedure : T) => void;

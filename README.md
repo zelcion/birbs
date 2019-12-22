@@ -249,7 +249,7 @@ _Removes a context from an EventManager. Returns the EventManager_
 _fetches a context from an EventManager. Returns a Context or undefined_
 
 ```javascript
-  EventManager.removeContext(context: Context | symbol);
+  EventManager.fetchContext(contextIdentifier: symbol);
 ```
 
 ### EventManager.broadcast()

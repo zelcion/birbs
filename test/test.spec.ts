@@ -1,5 +1,6 @@
 import { Context } from '../src/context/context';
 import { Effect } from '../src/utils/types';
+import { EventManager } from '../src/manager/manager';
 import { expect } from 'chai';
 import { Procedure } from '../src/procedure/procedure';
 import { toNewEffect } from '../src/utils/utils';
@@ -13,17 +14,17 @@ describe('Birbs API', () => {
     public testConstant = 'bar';
   }
 
-  class TestEffect extends Effect {
+  class TestEffect implements Effect {
     public execution(ev : TestProcedure) : void {
       console.log(ev);
     }
   }
-  describe('builds', () => {
+  describe('Builders', () => {
     it('Procedures', () => {
       const TestProcedureId = Symbol('test');
       const TestProcedureInstance = new TestProcedure()
         .withIdentifier(TestProcedureId)
-        .withLifecycle('permanent');
+        .withLifecycle('ephemeral');
 
       const builder = () : void => {
         TestProcedureInstance.build();
@@ -66,29 +67,156 @@ describe('Birbs API', () => {
 
       expect(builder).to.not.throw();
     });
+
+    it('Effect Maker and lazy builder', async (done) => {
+      function anAssertion (this : TestContext) : void {
+        expect(this.testConstant).to.be.equal('bar');
+        done();
+      };
+
+      const procedure = new TestProcedure()
+        .build({
+          effects: [toNewEffect(anAssertion)],
+          identifier: 'name',
+          lifecycle: 'permanent'
+        });
+
+      const context = new TestContext()
+        .build({
+          identifier: 'context',
+          strategy: 'no-flush'
+        });
+
+      context.sign(procedure);
+
+      context.trigger(procedure);
+    });
   });
 
-  it('Effect Maker and lazy builder', async (done) => {
-    function logggyyyy (this : TestContext) : void {
-      expect(this.testConstant).to.be.equal('bar');
-      done();
-    };
+  describe('Modules Interaction', () => {
+    it('Effect-Procedure-Context interaction', () => {
+      class MutateVariableValue extends Procedure {
+        public aSample : string;
 
-    const procedure = new TestProcedure()
-      .build({
-        effects: [toNewEffect(logggyyyy)],
-        identifier: 'name',
+        public constructor (value : string) {
+          super();
+          this.aSample = value;
+        }
+      }
+
+      class ModifyToRandomNumber implements Effect {
+        public execution (this : TestContext, ev : MutateVariableValue) : void {
+          this.testConstant = ev.aSample;
+        }
+      }
+
+      const aTestContext = new TestContext().build({
+        identifier: 'contextIdentifier',
+        strategy: 'each-publish'
+      });
+
+      const aProcedure = new MutateVariableValue(
+        (Math.random() * 10).toString()
+      ).build({
+        effects: [new ModifyToRandomNumber()],
+        identifier: 'procedureIdentifier',
+        lifecycle: 'ephemeral'
+      });
+
+      aTestContext.sign(aProcedure);
+      expect(aTestContext.hasProcedure(aProcedure)).to.be.true;
+
+      aTestContext.trigger(aProcedure.identifier);
+      expect(aTestContext.testConstant).to.be.eq(aProcedure.aSample);
+      expect(aTestContext.hasProcedure(aProcedure)).to.be.false;
+    });
+
+    it('Context-Procedure Lifecycle control', () => {
+      function anEffect (this : TestContext) : void {
+        // Empty sample effect
+      };
+
+      const aTestContext = new TestContext().build({
+        identifier: 'contextIdentifier',
+        strategy: 'each-publish'
+      });
+
+      const ephemeralProcedure = new TestProcedure().build({
+        effects: [toNewEffect(anEffect)],
+        identifier: 'ephmeralProcedure',
+        lifecycle: 'ephemeral'
+      });
+
+      const permanentProcedure = new TestProcedure().build({
+        effects: [toNewEffect(anEffect)],
+        identifier: 'permanentProcedure',
         lifecycle: 'permanent'
       });
 
-    const context = new TestContext()
-      .build({
-        identifier: 'context',
-        strategy: 'no-flush'
+      aTestContext.sign([ephemeralProcedure, permanentProcedure]);
+      expect(aTestContext.hasProcedure(permanentProcedure)).to.be.equal(true);
+      expect(aTestContext.hasProcedure(ephemeralProcedure)).to.be.equal(true);
+
+      aTestContext.trigger(permanentProcedure);
+
+      expect(aTestContext.hasProcedure(permanentProcedure)).to.be.equal(true);
+      expect(aTestContext.hasProcedure(ephemeralProcedure)).to.be.equal(false);
+
+      aTestContext.trigger(permanentProcedure);
+
+      expect(aTestContext.hasProcedure(permanentProcedure)).to.be.equal(true);
+      expect(aTestContext.hasProcedure(ephemeralProcedure)).to.be.equal(false);
+    });
+
+    it('EventManager-context interaction', () => {
+      function anEffect (this : TestContext) : void {
+        // Empty sample effect
+      };
+
+      const manager = new EventManager();
+
+      const aTestContext = new TestContext().build({
+        identifier: 'contextIdentifier',
+        strategy: 'each-publish'
       });
 
-    context.sign(procedure);
+      const anotherTestContext = new TestContext().build({
+        identifier: 'anotherContextIdentifier',
+        strategy: 'each-publish'
+      });
 
-    context.trigger(procedure);
+      const ephemeralProcedure = new TestProcedure().build({
+        effects: [toNewEffect(anEffect)],
+        identifier: 'ephmeralProcedure',
+        lifecycle: 'ephemeral'
+      });
+
+      const permanentProcedure = new TestProcedure().build({
+        effects: [toNewEffect(anEffect)],
+        identifier: 'permanentProcedure',
+        lifecycle: 'permanent'
+      });
+
+      manager.addContext(anotherTestContext);
+      manager.addContext(aTestContext);
+
+      expect(manager.fetchContext(anotherTestContext.identifier))
+        .to.be.equal(anotherTestContext);
+
+      manager.addProcedure(ephemeralProcedure, aTestContext);
+      manager.addProcedure(ephemeralProcedure, anotherTestContext);
+      manager.addProcedure(permanentProcedure, aTestContext);
+      manager.addProcedure(permanentProcedure, anotherTestContext);
+
+      expect(aTestContext.hasProcedure(permanentProcedure)).to.be.equal(true);
+      expect(aTestContext.hasProcedure(ephemeralProcedure)).to.be.equal(true);
+
+      manager.broadcast(ephemeralProcedure);
+
+      expect(aTestContext.hasProcedure(permanentProcedure)).to.be.equal(true);
+      expect(aTestContext.hasProcedure(ephemeralProcedure)).to.be.equal(false);
+      expect(anotherTestContext.hasProcedure(permanentProcedure)).to.be.equal(true);
+      expect(anotherTestContext.hasProcedure(ephemeralProcedure)).to.be.equal(false);
+    });
   });
 });

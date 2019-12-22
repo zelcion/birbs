@@ -2,14 +2,9 @@ import { FlushingStrategies, ProcedureLifecycle } from '../utils/types';
 import { getIdentifierOf, getStringFromSymbol } from '../utils/utils';
 import { throwIfNoProcedureFound, throwNoProceduresRegistered } from '../utils/error-handler';
 import { ContextBuilder } from './context-builder';
-import { EventEmitter } from 'events';
 import { Procedure } from '../procedure/procedure';
 
-class CustomEmitter extends EventEmitter {};
-
 export class Context extends ContextBuilder{
-  private _emitter : CustomEmitter = new CustomEmitter;
-
   public get flushingStrategy() : FlushingStrategies {
     return this._flushingStrategy;
   }
@@ -48,8 +43,6 @@ export class Context extends ContextBuilder{
   }
 
   private _clearEphemeralProcedures() : void {
-    throwNoProceduresRegistered(this._procedures);
-
     this._procedures.forEach((procedure) => {
       if (procedure.lifecycle === 'ephemeral') this._emitter.removeAllListeners(procedure.identifier);
     });
@@ -68,7 +61,7 @@ export class Context extends ContextBuilder{
     return list;
   }
 
-  public _signProcedureByType(procedure : Procedure) : void {
+  private _signProcedureByType(procedure : Procedure) : void {
     this._procedures.set(procedure.identifier, procedure);
 
     if (procedure.lifecycle === 'permanent') {

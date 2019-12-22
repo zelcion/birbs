@@ -11,26 +11,25 @@ export class Procedure extends ProcedureBuilder{
     return this._lifecycle;
   }
 
+  public get effects () : Effect[] {
+    return this._effects;
+  }
+
   public constructor () {
     super();
     this.Run = this.Run.bind(this);
   }
 
-  public get effects () : Effect[] {
-    return this._effects;
-  }
-
-  public async Run(context : Context) : Promise<void> {
+  public Run(context : Context) : Promise<void[]> {
     if (context === undefined) throw TypeError('This method needs to be called from a context.');
 
-    const executionCompletion = [];
+    const executionCompletion : Array<void> = [];
     this._effects.forEach((effect) => {
       const exec = effect.execution.bind(context);
       executionCompletion.push(exec(this));
     });
 
-    await Promise.all(executionCompletion);
-    return;
+    return Promise.all(executionCompletion);
   }
 
 };
