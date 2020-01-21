@@ -4,11 +4,11 @@ import { Pipeline } from './procedure/pipeline';
 import { Procedure } from './procedure/procedure';
 import { toNewEffect } from './utils/utils';
 
-export const utils = {
+const utils = {
   toNewEffect: toNewEffect
 };
 
-export const birbsModule = {
+export default {
   Context,
   EventManager,
   Pipeline,
