@@ -2,11 +2,12 @@ import { Effect, ProcedureLifecycle, ProcedureOptions, VoidableProcedureModifier
 import { setSymbol, throwInvalidProcedureLifecycle } from '../utils/utils';
 import {
   throwMethodNotPresent,
-  throwNoEffects,
+  throwNoActions,
   throwNoIdentifier,
   throwTargetAlreadyBuilt,
   throwWrongType
 } from '../utils/error-handler';
+import { Pipeline } from './pipeline';
 import { Procedure } from './procedure';
 
 export class ProcedureBuilder {
@@ -14,6 +15,7 @@ export class ProcedureBuilder {
   protected _identifier : symbol;
   protected _lifecycle : ProcedureLifecycle;
   protected _effects : Effect[] = [];
+  protected _pipelines : Pipeline[] = [];
 
   public build <T extends Procedure>(this : T, options ?: ProcedureOptions) : T{
     throwTargetAlreadyBuilt(this._modifiers);
@@ -24,7 +26,7 @@ export class ProcedureBuilder {
 
     if (options !== undefined) this._applyOptions(options);
 
-    throwNoEffects(this);
+    throwNoActions(this);
     throwNoIdentifier(this);
 
     this._modifiers = null;
@@ -73,6 +75,16 @@ export class ProcedureBuilder {
 
     this._newModifier((procedure : T) : void => {
       procedure._effects.push(effect);
+    });
+
+    return this;
+  }
+
+  public withPipeline <T extends Procedure>(pipeline : Pipeline) : this {
+    throwTargetAlreadyBuilt(this._modifiers);
+
+    this._newModifier((procedure : T) : void => {
+      procedure._pipelines.push(pipeline);
     });
 
     return this;

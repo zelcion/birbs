@@ -40,12 +40,13 @@ export const toNewEffect = <T extends Procedure, Y extends Context>(execution : 
     throw TypeError('The argument is not a function.');
   }
 
-  class StandardEffect implements Effect {
+  class StandardEffect implements Effect<T, Y> {
     private _boundExecution : Execution<T, Y>;
 
     constructor (exec : Execution<T, Y>) {
       this.execution = exec;
     }
+
     execution(event : T) : void {
       console.log(event, 'you probably forgot to pass in a function here.');
       throw TypeError('missing function on the argument');

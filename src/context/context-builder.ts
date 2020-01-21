@@ -9,7 +9,7 @@ export class ContextBuilder {
   private _modifiers : VoidableContainerModifier[] | null = [];
   protected _emitter : EventEmitter = new EventEmitter;
   protected _identifier : symbol;
-  public _procedures : Map<symbol, Procedure> = new Map();
+  protected _procedures : Map<symbol, Procedure> = new Map();
   protected _flushingStrategy : FlushingStrategies;
 
   public build<T extends Context>(this : T, options ?: ContextOptions) : T {

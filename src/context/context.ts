@@ -73,7 +73,7 @@ export class Context extends ContextBuilder{
     return;
   }
 
-  public sign(procedure : Procedure[] | Procedure) : Context {
+  public sign(procedure : Procedure[] | Procedure) : this {
     if (Array.isArray(procedure)) {
       procedure.forEach((event) => {
         this._signProcedureByType(event);
@@ -85,7 +85,7 @@ export class Context extends ContextBuilder{
     return this;
   }
 
-  public resign(procedure : Procedure[] | Procedure | symbol[] | symbol) : Context {
+  public resign(procedure : Procedure[] | Procedure | symbol[] | symbol) : this {
     if (Array.isArray(procedure)) {
       procedure.forEach((event : symbol | Procedure) => {
         this._emitter.removeAllListeners(getIdentifierOf(event));
@@ -99,13 +99,11 @@ export class Context extends ContextBuilder{
     return this;
   }
 
-  public getProcedure(procedureId : symbol) : Procedure | undefined{
+  public getProcedure(procedureId : symbol) : Procedure | undefined {
     return this._procedures.get(procedureId);
   }
 
   public hasProcedure(procedure : symbol | Procedure) : boolean {
     return this._procedures.has(getIdentifierOf(procedure));
   }
-
-  // Add Runions to Procedures [By Symbol or By itself]
 };

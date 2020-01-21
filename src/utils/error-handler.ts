@@ -2,9 +2,9 @@ import { EventRegistryQuery, Identifiable, VoidableContainerModifier, VoidablePr
 import { Context } from '../context/context';
 import { Procedure } from '../procedure/procedure';
 
-export function throwNoEffects (procedure : Procedure) : void {
-  if (procedure.effects.length === 0) {
-    throw TypeError('Error while trying to build or execute procedure: No Effects registered');
+export function throwNoActions (procedure : Procedure) : void {
+  if (procedure.effects.length === 0 && procedure.pipelines.length === 0) {
+    throw TypeError('Error while trying to build or execute procedure: No Effects and no Pipelines registered');
   }
 };
 

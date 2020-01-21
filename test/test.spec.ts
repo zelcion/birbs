@@ -2,6 +2,7 @@ import { Context } from '../src/context/context';
 import { Effect } from '../src/utils/types';
 import { EventManager } from '../src/manager/manager';
 import { expect } from 'chai';
+import { Pipeline } from '../src/procedure/pipeline';
 import { Procedure } from '../src/procedure/procedure';
 import { toNewEffect } from '../src/utils/utils';
 
@@ -218,5 +219,52 @@ describe('Birbs API', () => {
       expect(anotherTestContext.hasProcedure(permanentProcedure)).to.be.equal(true);
       expect(anotherTestContext.hasProcedure(ephemeralProcedure)).to.be.equal(false);
     });
+  });
+
+  it('[ASYNC] Pipelines tests', (done) => {
+    class NumberContext extends Context {
+      public currentCounter = 10;
+    }
+
+    class AddToCounter implements Effect<Procedure> {
+      execution(this : NumberContext) : void {
+        this.currentCounter += 8;
+      }
+    }
+
+    class DivideCounter implements Effect<Procedure> {
+      async execution(this : NumberContext) : Promise<void> {
+        return new Promise((resolve) => {
+          setTimeout(() => {
+            resolve();
+          }, 1000);
+          this.currentCounter = this.currentCounter / 2 ;
+        });
+      }
+    }
+
+    class MicroAddToCounter implements Effect<Procedure> {
+      execution(this : NumberContext) : void {
+        this.currentCounter += 0.000888;
+      }
+    }
+
+    const pipe = new Pipeline(() => {
+      expect(contextInstance.currentCounter).to.be.equal(9.000888);
+      done();
+    })
+      .step(new AddToCounter())
+      .step(new DivideCounter())
+      .step(new MicroAddToCounter());
+
+    const procInstance = new TestProcedure().withIdentifier('Yaa')
+      .withLifecycle('permanent')
+      .withPipeline(pipe)
+      .build();
+
+    const contextInstance = new NumberContext().withIdentifier('oo').withProcedures(procInstance)
+      .withStrategy('no-flush').build();
+
+    contextInstance.trigger(procInstance.identifier);
   });
 });

@@ -1,5 +1,6 @@
 import { Effect, ProcedureLifecycle } from '../utils/types';
 import { Context } from '../context/context';
+import { Pipeline } from './pipeline';
 import { ProcedureBuilder } from './procedure-builder';
 
 export class Procedure extends ProcedureBuilder{
@@ -11,8 +12,12 @@ export class Procedure extends ProcedureBuilder{
     return this._lifecycle;
   }
 
-  public get effects () : Effect[] {
+  public get effects () : Effect<this>[] {
     return this._effects;
+  }
+
+  public get pipelines () : Pipeline<this>[] {
+    return this._pipelines;
   }
 
   public constructor () {
@@ -27,6 +32,10 @@ export class Procedure extends ProcedureBuilder{
     this._effects.forEach((effect) => {
       const exec = effect.execution.bind(context);
       executionCompletion.push(exec(this));
+    });
+
+    this._pipelines.forEach((pipeline) => {
+      executionCompletion.push(pipeline.executePipeline(context, this));
     });
 
     return Promise.all(executionCompletion);
