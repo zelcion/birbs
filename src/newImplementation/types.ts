@@ -8,7 +8,7 @@ export abstract class Identifiable {
   private readonly _identifier : symbol;
 
   /**
-   * The identifier of this context
+   * The identifier of this Entity
    */
   get identifier() : symbol {
     return this._identifier;
@@ -26,10 +26,12 @@ export abstract class BirbsRunnable extends Identifiable {
    * Method used when the Runnable was triggered
    * @param context The context used to execute this function in
    */
-  abstract execute <T extends Context>(context : T, identifier ?: Identifier) : Promise<void>;
+  abstract execute (context : Context, identifier ?: symbol) : Promise<void>;
 
   public constructor (options : BirbsOption = { identifier: Symbol('default'), lifetime: 'SINGLE' }) {
     super(options.identifier);
+
+    this.lifetime = options.lifetime;
   };
 }
 

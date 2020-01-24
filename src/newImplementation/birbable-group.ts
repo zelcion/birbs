@@ -3,27 +3,28 @@ import { Context } from './context';
 
 export class BirbableGroup extends BirbsRunnable {
   public readonly __type = 'BIRBABLE_GROUP';
-  public readonly birbableList : Birbable[] = [];
+  public readonly birbableList : Map<symbol, Birbable> = new Map();
 
   public constructor (identifier : Identifier) {
     super({ identifier, lifetime: 'DURABLE' });
+
+    this.execute = this.execute.bind(this);
   }
 
-  async execute<T extends Context>(context : T, identifier : Identifier) : Promise<void> {
-    let foundIndex : number;
-    const birbable = this.birbableList.find((birbable, index) => {
-      if (birbable.identifier === identifier) {
-        foundIndex = index;
-        return true;
-      };
-    });
+  public addBirbable(birbable : Birbable) : this {
+    this.birbableList.set(birbable.identifier, birbable);
 
-    this.birbableList.splice(foundIndex, 1);
-    await birbable.execute(context, identifier);
+    return this;
+  }
 
-    this.birbableList.forEach((remainingBirbable) => {
-      context.unsign(remainingBirbable);
+  async execute<T extends Context>(context : T, identifier : symbol) : Promise<void> {
+    const selectedBirbable = this.birbableList.get(identifier);
+    selectedBirbable.execute(context, identifier);
+
+    this.birbableList.forEach((birbableInGroup) => {
+      context.unsign(birbableInGroup);
     });
+    this.birbableList.clear();
 
     return;
   }

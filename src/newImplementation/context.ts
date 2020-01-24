@@ -6,8 +6,8 @@ import { EventEmitter } from 'events';
  * it gets executed. A context may have any Bibrbable instance signed on it.
  */
 export class Context extends Identifiable {
-  private readonly emitter : EventEmitter = new EventEmitter();
-  private readonly birbables : Map<symbol, Birbable> = new Map();
+  public readonly emitter : EventEmitter = new EventEmitter();
+  public readonly birbables : Map<symbol, Birbable> = new Map();
 
   /**
    * Executes an Executable entity
@@ -18,9 +18,8 @@ export class Context extends Identifiable {
       return this;
     }
 
-    this.emitter.emit(identifier, this, identifier);
-
     this.unmount(this.birbables.get(identifier));
+    this.emitter.emit(identifier, this, identifier);
     return this;
   }
 
@@ -36,14 +35,13 @@ export class Context extends Identifiable {
     if (birbable.__type === 'BIRBABLE_GROUP') {
       birbable.birbableList.forEach((birbsExecutable) => {
         this.emitter.once(birbsExecutable.identifier, birbable.execute);
+        this.birbables.set(birbsExecutable.identifier, birbable);
       });
 
-      this.birbables.set(birbable.identifier, birbable);
       return this;
     }
 
     this.birbables.set(birbable.identifier, birbable);
-
     this._addToListener(birbable);
 
     return this;
@@ -52,8 +50,10 @@ export class Context extends Identifiable {
   public unsign (birbable : Birbable) : this {
     const foundBirbable = this.birbables.get(birbable.identifier);
 
-    if (foundBirbable !== undefined) this.birbables.delete(birbable.identifier);
-    this.emitter.removeAllListeners(birbable.identifier);
+    if (foundBirbable !== undefined) {
+      this.birbables.delete(birbable.identifier);
+      this.emitter.removeAllListeners(birbable.identifier);
+    }
 
     return this;
   }

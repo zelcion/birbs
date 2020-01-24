@@ -37,11 +37,14 @@ export class Pipeline extends BirbsRunnable {
     super(options);
     this.onFinish = onFinish;
     this.onFail = onFail;
+
+    this.execute = this.execute.bind(this);
+    this.runStep = this.runStep.bind(this);
   }
 
   private async runStep(identifier : Identifier) : Promise<void> {
     if (this.steps.get(this.currentStep) === undefined) {
-      if (this.onFinish !== undefined) this.onFinish();
+      if (this.onFinish !== undefined) this.onFinish(this.context);
       return;
     }
 
@@ -64,8 +67,7 @@ export class Pipeline extends BirbsRunnable {
    * the context type that you are working with so it is possible to
    * assert the type that you're working with
    */
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  public async execute <T extends Context>(context : T, identifier : Identifier) : Promise<void> {
+  public async execute (context : Context, identifier : Identifier) : Promise<void> {
     this.context = context;
 
     await this.runStep(identifier);
