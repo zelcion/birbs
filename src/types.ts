@@ -2,7 +2,17 @@ import { BirbableGroup } from './birbable-group';
 import { Context } from './context';
 import { Pipeline } from './pipeline';
 import { Procedure } from './procedure';
-import { setSymbol } from '../utils/utils';
+
+export const setSymbol = (entry : symbol | string) : symbol => {
+  let result : symbol;
+  if (typeof entry === 'string') {
+    result = Symbol(entry);
+    return result;
+  }
+
+  result = entry;
+  return result;
+};
 
 export abstract class Identifiable {
   private readonly _identifier : symbol;

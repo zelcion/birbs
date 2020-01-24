@@ -1,17 +1,13 @@
-import { Context } from './context/context';
-import { EventManager } from './manager/manager';
-import { Pipeline } from './procedure/pipeline';
-import { Procedure } from './procedure/procedure';
-import { toNewEffect } from './utils/utils';
+import { BirbableGroup } from './birbable-group';
+import { Context } from './context';
+import { EventManager } from './manager';
+import { Pipeline } from './pipeline';
+import { Procedure } from './procedure';
 
-const utils = {
-  toNewEffect: toNewEffect
-};
-
-export default {
+export const Birbs = {
+  BirbableGroup,
   Context,
   EventManager,
   Pipeline,
   Procedure,
-  utils
 };

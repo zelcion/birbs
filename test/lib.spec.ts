@@ -1,10 +1,10 @@
 import { describe, it } from 'mocha';
-import { BirbableGroup } from '../birbable-group';
-import { Context } from '../context';
+import { BirbableGroup } from '../src/birbable-group';
+import { Context } from '../src/context';
 import { expect } from 'chai';
-import { Identifier } from '../types';
-import { Pipeline } from '../pipeline';
-import { Procedure } from '../procedure';
+import { Identifier } from '../src/types';
+import { Pipeline } from '../src/pipeline';
+import { Procedure } from '../src/procedure';
 
 describe('[ BIRBS API ]', () => {
   it('Context fires events successfully', () => {
@@ -107,7 +107,7 @@ describe('[ BIRBS API ]', () => {
     expect(context.text).to.be.equal('Hello! i am a test text texst');
   });
 
-  it('Birbables with DURABLE lifetime gets removed from the context', () => {
+  it('Birbables with DURABLE lifetime does not get removed from the context', () => {
     class TestContext extends Context {
       public text = 'i am a test text texst';
     }

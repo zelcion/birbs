@@ -3,12 +3,6 @@
 
 Capture and admire all your joyful events with this event manager and encapsulator!
 
---------------------
-#### A Quick Heads'up
-
-> We will soon update to version `0.5`, which will be the first production-ready package!
-> Is there something you would like to see in Birbs? I'd like to hear it! [Tell me!](https://github.com/flgmjr/birbs/issues/new)
-
 ------------------
 ## Table of Contents
 - [Why Birbs?](https://github.com/flgmjr/birbs#what-is-birbs-why-birbs)
