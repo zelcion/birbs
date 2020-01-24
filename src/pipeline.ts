@@ -1,4 +1,4 @@
-import { BirbsOption, BirbsRunnable, Identifier } from './types';
+import { Birbable, BirbsOption, BirbsRunnable } from './types';
 import { Context } from './context';
 import { Procedure } from './procedure';
 
@@ -7,10 +7,8 @@ import { Procedure } from './procedure';
  */
 export class Pipeline extends BirbsRunnable {
   public readonly __type = 'PIPELINE';
-  private context;
 
-  private steps : Map<number, Procedure> = new Map();
-  private currentStep = 0;
+  private steps : Map<symbol, Procedure> = new Map();
   private readonly onFinish ?: CallableFunction;
   private readonly onFail ?: CallableFunction;
 
@@ -19,7 +17,7 @@ export class Pipeline extends BirbsRunnable {
    * @param procedure The next procedure to execute
    */
   public addStep(procedure : Procedure) : Pipeline {
-    this.steps.set(this.steps.size, procedure);
+    this.steps.set(procedure.identifier, procedure);
 
     return this;
   };
@@ -39,27 +37,24 @@ export class Pipeline extends BirbsRunnable {
     this.onFail = onFail;
 
     this.execute = this.execute.bind(this);
-    this.runStep = this.runStep.bind(this);
+    this.runPipeline = this.runPipeline.bind(this);
   }
 
-  private async runStep(identifier : Identifier) : Promise<void> {
-    if (this.steps.get(this.currentStep) === undefined) {
-      if (this.onFinish !== undefined) this.onFinish(this.context);
-      return;
-    }
-
-    const stepExecution = this.steps.get(this.currentStep);
-
-    try {
-      await stepExecution.execute(this.context, identifier);
-    } catch (error) {
+  private catchFail () : (error : Error) => void {
+    return ((error) : void => {
       if (this.onFail !== undefined) { this.onFail(error); return; }
 
       throw error;
+    });
+  }
+
+  private async runPipeline(executionList : Birbable[], context : Context) : Promise<void> {
+    for (const birbable of executionList) {
+      await birbable.execute(context).catch(this.catchFail());
     }
 
-    this.currentStep += 1;
-    this.runStep(identifier);
+    if (this.onFinish !== undefined) this.onFinish(context);
+    return;
   };
 
   /**
@@ -67,9 +62,12 @@ export class Pipeline extends BirbsRunnable {
    * the context type that you are working with so it is possible to
    * assert the type that you're working with
    */
-  public async execute (context : Context, identifier : Identifier) : Promise<void> {
-    this.context = context;
+  public async execute (context : Context) : Promise<void> {
+    const executionList : Birbable[] = [];
+    this.steps.forEach((birbable) => {
+      executionList.push(birbable);
+    });
 
-    await this.runStep(identifier);
+    await this.runPipeline(executionList, context);
   }
 }

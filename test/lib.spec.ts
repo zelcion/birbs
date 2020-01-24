@@ -1,22 +1,19 @@
 import { describe, it } from 'mocha';
-import { BirbableGroup } from '../src/birbable-group';
 import { Context } from '../src/context';
 import { expect } from 'chai';
-import { Identifier } from '../src/types';
 import { Pipeline } from '../src/pipeline';
 import { Procedure } from '../src/procedure';
 
 describe('[ BIRBS API ]', () => {
   it('Context fires events successfully', () => {
     class TestContext extends Context {
-      public text = 'AAAIOW';
+      public text = 'text ';
     }
 
     class TestProcedure extends Procedure {
       private counter = 1;
 
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      public async execute (context : TestContext, _identifier : Identifier) : Promise<void> {
+      public async execute (context : TestContext) : Promise<void> {
         context.text = context.text + this.counter;
 
         this.counter += 1;
@@ -25,12 +22,19 @@ describe('[ BIRBS API ]', () => {
 
     const procedureCreated = new TestProcedure({ identifier: 'aa', lifetime: 'DURABLE' });
     const contextCreated = new TestContext('context').sign(procedureCreated);
+    const secondContext = new TestContext('context2');
+    secondContext.text = 'hello ';
+    secondContext.sign(procedureCreated);
 
     contextCreated.trigger(procedureCreated.identifier);
-    expect(contextCreated.text).to.be.equal('AAAIOW1');
+    expect(contextCreated.text).to.be.equal('text 1');
 
     contextCreated.trigger(procedureCreated.identifier);
-    expect(contextCreated.text).to.be.equal('AAAIOW12');
+    expect(contextCreated.text).to.be.equal('text 12');
+
+    secondContext.trigger(procedureCreated.identifier);
+    expect(secondContext.text).to.be.equal('hello 3');
+
   });
 
   it('Pipelines executes in order', (done) => {
@@ -39,15 +43,13 @@ describe('[ BIRBS API ]', () => {
     }
 
     class AddToCounter extends Procedure {
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      async execute(context : NumberContext, _identifier : Identifier) : Promise<void> {
+      async execute(context : NumberContext) : Promise<void> {
         context.currentCounter += 8;
       }
     }
 
     class DivideCounter extends Procedure {
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      async execute(context : NumberContext, _identifier : Identifier) : Promise<void> {
+      async execute(context : NumberContext) : Promise<void> {
         return new Promise((resolve) => {
           setTimeout(() => {
             resolve();
@@ -58,8 +60,7 @@ describe('[ BIRBS API ]', () => {
     }
 
     class MicroAddToCounter extends Procedure {
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      async execute(context : NumberContext, _identifier : Identifier) : Promise<void> {
+      async execute(context : NumberContext) : Promise<void> {
         context.currentCounter += 0.000888;
       }
     }
@@ -91,8 +92,7 @@ describe('[ BIRBS API ]', () => {
     }
 
     class Helloizer extends Procedure {
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      async execute (context : TestContext, identifier : Identifier) : Promise<void> {
+      async execute (context : TestContext) : Promise<void> {
         context.text = `Hello! ${context.text}`;
       }
     }
@@ -113,8 +113,7 @@ describe('[ BIRBS API ]', () => {
     }
 
     class Helloizer extends Procedure {
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      async execute (context : TestContext, identifier : Identifier) : Promise<void> {
+      async execute (context : TestContext) : Promise<void> {
         context.text = `Hello! ${context.text}`;
       }
     }
@@ -135,35 +134,33 @@ describe('[ BIRBS API ]', () => {
     }
 
     class Helloizer extends Procedure {
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      async execute (context : TestContext, identifier : Identifier) : Promise<void> {
+      async execute (context : TestContext) : Promise<void> {
         context.text = `Hello! ${context.text}`;
       }
     }
 
     class Goodbyzer extends Procedure {
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      async execute (context : TestContext, identifier : Identifier) : Promise<void> {
+      async execute (context : TestContext) : Promise<void> {
         context.text = `Goodbye! ${context.text}`;
       }
     }
 
     class Mehizer extends Procedure {
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      async execute (context : TestContext, identifier : Identifier) : Promise<void> {
+      async execute (context : TestContext) : Promise<void> {
         context.text = `Meh! ${context.text}`;
       }
     }
 
-    const helloizer = new Helloizer({ identifier: 'hello', lifetime: 'DURABLE'});
-    const goodbyzer = new Goodbyzer({ identifier: 'goodbye', lifetime: 'DURABLE'});
-    const mehizer = new Mehizer({ identifier: 'meh', lifetime: 'DURABLE'});
-    const birbableGroup = new BirbableGroup('group')
-      .addBirbable(goodbyzer).addBirbable(helloizer).addBirbable(mehizer);
+    const groupToken = Symbol('Group');
+
+    const helloizer = new Helloizer({ group: groupToken, identifier: 'hello', lifetime: 'DURABLE' });
+    const goodbyzer = new Goodbyzer({ group: groupToken, identifier: 'goodbye', lifetime: 'DURABLE'});
+    const mehizer = new Mehizer({ group: groupToken, identifier: 'meh', lifetime: 'DURABLE'});
 
     const context = new TestContext('context');
-    context.sign(birbableGroup);
+    context.sign(helloizer).sign(goodbyzer).sign(mehizer);
 
+    context[helloizer.identifier];
     context.trigger(helloizer.identifier);
     expect(context.text).to.be.equal('Hello! i am a test text texst');
 

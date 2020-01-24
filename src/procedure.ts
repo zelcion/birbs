@@ -1,4 +1,4 @@
-import { BirbsOption, BirbsRunnable, Identifier } from './types';
+import { BirbsOption, BirbsRunnable } from './types';
 import { Context } from './context';
 
 /**
@@ -6,13 +6,13 @@ import { Context } from './context';
  * or Birbable Group
  */
 export abstract class Procedure extends BirbsRunnable {
+  public readonly __type = 'PROCEDURE';
+
   public constructor (options : BirbsOption) {
     super(options);
 
     this.execute = this.execute.bind(this);
   }
 
-  public readonly __type = 'PROCEDURE';
-
-  public abstract execute (context : Context, identifier : Identifier) : Promise<void>;
+  public abstract execute (context : Context) : Promise<void>;
 }
