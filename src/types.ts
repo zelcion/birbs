@@ -2,67 +2,56 @@ import { Context } from './context';
 import { Pipeline } from './pipeline';
 import { Procedure } from './procedure';
 
-export const setSymbol = (entry : Identifier) : symbol => {
-  let result : symbol;
-  if (typeof entry === 'string') {
-    result = Symbol(entry);
-    return result;
-  }
-
-  result = entry;
-  return result;
-};
-
-export abstract class Identifiable {
-  private readonly _identifier : symbol;
+/**
+ * The base class that a context uses to trigger events.
+ */
+export abstract class BirbsRunnable {
+  private readonly __lifetime : Lifetime;
+  private readonly __group ?: symbol;
 
   /**
-   * The identifier of this Entity
+   * The lifespan of the Birbable Entity
+   * can be either 'SINGLE' or 'DURABLE'
    */
-  get identifier() : symbol {
-    return this._identifier;
-  };
-
-  public constructor (identifier : Identifier) {
-    this._identifier = setSymbol(identifier);
+  public get lifetime () : Lifetime {
+    return this.__lifetime;
   }
-}
 
-export abstract class BirbsRunnable extends Identifiable {
-  public readonly __lifetime : Lifetime;
-  public readonly __group ?: symbol;
+  /**
+   * The Birbable group of the procedure or pipeline.
+   * Only a single procedure of a group may be executed at a time, others of the
+   * same group will be discarded when one is emitted.
+   */
+  public get group () : symbol {
+    return this.__group;
+  }
+
   /**
    * Method used when the Runnable was triggered
    * @param context The context used to execute this function in
    */
   abstract execute (context : Context) : Promise<void>;
 
-  public constructor (options : BirbsOption = { identifier: Symbol('default'), lifetime: 'SINGLE' }) {
-    super(options.identifier);
+  public constructor (options : BirbsOption = { lifetime: 'SINGLE' }) {
 
     this.__lifetime = options.lifetime;
 
     if (options.group !== undefined) { this.__group = options.group; }
   };
 
+  /**
+   * @returns a Boolean representing if the entity belongs to any group
+   */
   get belongsToGroup () : boolean {
     return this.__group !== undefined;
   }
 }
 
-export type Identifier = string | symbol;
 export type Lifetime = 'DURABLE' | 'SINGLE';
 
 export type BirbsOption = {
-  identifier : Identifier;
   lifetime : Lifetime;
   group ?: symbol;
 };
 
 export type Birbable = Procedure | Pipeline;
-
-export const getIdentifierOf = (identity : Identifiable | symbol) : symbol => {
-  if (typeof identity === 'symbol') return identity;
-
-  return identity.identifier;
-};

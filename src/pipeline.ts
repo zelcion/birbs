@@ -5,10 +5,10 @@ import { Procedure } from './procedure';
 /**
  * Birbable entity used to run a sequence of Procedures
  */
-export class Pipeline extends BirbsRunnable {
+export abstract class Pipeline extends BirbsRunnable {
   public readonly __type = 'PIPELINE';
 
-  private steps : Map<symbol, Procedure> = new Map();
+  private steps : Map<string, Procedure> = new Map();
   private readonly onFinish ?: CallableFunction;
   private readonly onFail ?: CallableFunction;
 
@@ -17,7 +17,7 @@ export class Pipeline extends BirbsRunnable {
    * @param procedure The next procedure to execute
    */
   public addStep(procedure : Procedure) : Pipeline {
-    this.steps.set(procedure.identifier, procedure);
+    this.steps.set(procedure.constructor.name, procedure);
 
     return this;
   };

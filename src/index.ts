@@ -3,7 +3,7 @@ import { EventManager } from './manager';
 import { Pipeline } from './pipeline';
 import { Procedure } from './procedure';
 
-export const Birbs = {
+export {
   Context,
   EventManager,
   Pipeline,

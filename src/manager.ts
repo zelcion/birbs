@@ -1,50 +1,70 @@
+import { Birbable } from './types';
 import { Context } from './context';
-import { getIdentifierOf } from './types';
-import { Procedure } from './procedure';
 
+/**
+ * Holds Contexts and broadcasts events to them
+ */
 export class EventManager {
-  private _contexts : Map<symbol, Context> = new Map();
+  private _contexts : Map<string, Context> = new Map();
 
+  /**
+   * Adds a context to this event manager.
+   * @param context
+   */
   public addContext(context : Context) : EventManager {
-    this._contexts.set(context.identifier, context);
+    this._contexts.set(context.constructor.name, context);
     return this;
   }
 
-  public removeContext(context : Context | symbol) : EventManager {
-    this._contexts.delete(getIdentifierOf(context));
+  /**
+   * Removes a context from this event manager.
+   * @param contexName
+   */
+  public removeContext(contexName : string) : EventManager {
+    this._contexts.delete(contexName);
     return this;
   }
 
-  public fetchContext(contextIdentifier : symbol) : Context | undefined {
-    return this._contexts.get(contextIdentifier);
-  }
-
-  public broadcast(birbable : Procedure | symbol, context ?: Context | symbol) : EventManager {
+  /**
+   * Broadcasts a Birbable to a specific context on this manager, or to all of them
+   * @param birbable The specified name of the birbable entity
+   * @param context Optional - the context to trigger the Birbable
+   */
+  public broadcast(birbable : string, context ?: string) : EventManager {
     const chosenContext = (context !== undefined)?
-      this._contexts.get(getIdentifierOf(context)) : undefined;
+      this._contexts.get(context) : undefined;
 
     if (chosenContext === undefined) {
       this._contexts.forEach(
         (selectedContext) => {
-          selectedContext.trigger(getIdentifierOf(birbable));
+          selectedContext.trigger(birbable);
         }
       );
 
       return this;
     }
 
-    chosenContext.trigger(getIdentifierOf(birbable));
+    chosenContext.trigger(birbable);
     return this;
   }
 
-  public addProcedure(procedure : Procedure, context : Context | symbol) : EventManager {
-    this._contexts.get(getIdentifierOf(context)).sign(procedure);
+  /**
+   * Signs a Birbable to a Context
+   * @param birbable The birbable to add
+   * @param context The context to add the birbable to
+   */
+  public addProcedure(birbable : Birbable, context : string) : EventManager {
+    this._contexts.get(context).sign(birbable);
     return this;
   }
 
-  public removeProcedure(procedure : Procedure, context : Context | symbol) : EventManager {
-    this._contexts.get(getIdentifierOf(context)).unsign(procedure);
+  /**
+   * Removes a Birbable from a Context
+   * @param birbable The birbable to remove
+   * @param context The context to remove the birbable from
+   */
+  public removeProcedure(birbable : Birbable, context : string) : EventManager {
+    this._contexts.get(context).unsign(birbable);
     return this;
   }
-
 };
