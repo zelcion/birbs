@@ -33,22 +33,23 @@ export class EventManager {
    * Broadcasts a Birbable to a specific context on this manager, or to all of them
    * @param birbable The specified name of the birbable entity
    * @param context Optional - the context to trigger the Birbable
+   * @param descriptable Optional - Additional info to be sent to the Birbable
    */
-  public broadcast(birbable : string, context ?: string) : EventManager {
+  public broadcast(birbable : string, context ?: string, descriptable?) : EventManager {
     const chosenContext = (context !== undefined)?
       this.__contexts.get(context) : undefined;
 
     if (chosenContext === undefined) {
       this.__contexts.forEach(
         (selectedContext) => {
-          selectedContext.trigger(birbable);
+          selectedContext.trigger(birbable, descriptable);
         }
       );
 
       return this;
     }
 
-    chosenContext.trigger(birbable);
+    chosenContext.trigger(birbable, descriptable);
     return this;
   }
 

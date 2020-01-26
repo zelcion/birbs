@@ -4,6 +4,7 @@ import { Procedure } from './procedure';
 
 /**
  * Birbable entity used to run a sequence of Procedures
+ * @abstract
  */
 export abstract class Pipeline extends BirbsRunnable {
   /**
@@ -52,9 +53,9 @@ export abstract class Pipeline extends BirbsRunnable {
     });
   }
 
-  private async runPipeline(executionList : Birbable[], context : Context) : Promise<void> {
+  private async runPipeline(executionList : Birbable[], context : Context, descriptable?) : Promise<void> {
     for (const birbable of executionList) {
-      await birbable.execute(context).catch(this.catchFail());
+      await birbable.execute(context, descriptable).catch(this.catchFail());
     }
 
     if (this.onFinish !== undefined) this.onFinish(context);
@@ -66,12 +67,12 @@ export abstract class Pipeline extends BirbsRunnable {
    * the context type that you are working with so it is possible to
    * assert the type that you're working with
    */
-  public async execute (context : Context) : Promise<void> {
+  public async execute (context : Context, descriptable?) : Promise<void> {
     const executionList : Birbable[] = [];
     this.steps.forEach((birbable) => {
       executionList.push(birbable);
     });
 
-    await this.runPipeline(executionList, context);
+    await this.runPipeline(executionList, context, descriptable);
   }
 }

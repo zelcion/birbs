@@ -14,10 +14,10 @@ describe('[ BIRBS API ]', () => {
     class TestProcedure extends Procedure {
       private counter = 1;
 
-      public async execute (context : TestContext) : Promise<void> {
+      public async execute (context : TestContext, descriptable ?: number ) : Promise<void> {
         context.text = context.text + this.counter;
 
-        this.counter += 1;
+        this.counter += descriptable || 1;
       };
     }
 
@@ -29,11 +29,11 @@ describe('[ BIRBS API ]', () => {
 
     manager.addContext(contextCreated).addProcedure(procedureCreated, contextId);
 
-    manager.broadcast('TestProcedure');
+    manager.broadcast('TestProcedure', contextId, 8);
     expect(contextCreated.text).to.be.equal('text 1');
 
     manager.broadcast('TestProcedure');
-    expect(contextCreated.text).to.be.equal('text 12');
+    expect(contextCreated.text).to.be.equal('text 19');
 
   });
 

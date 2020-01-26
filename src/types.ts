@@ -4,6 +4,7 @@ import { Procedure } from './procedure';
 
 /**
  * The base class that a context uses to trigger events.
+ * @abstract
  */
 export abstract class BirbsRunnable {
   private readonly __lifetime : Lifetime;
@@ -31,6 +32,8 @@ export abstract class BirbsRunnable {
    * @param context The context used to execute this function in
    */
   abstract execute (context : Context) : Promise<void>;
+
+  abstract execute (context : Context, descriptable) : Promise<void>;
 
   public constructor (options : BirbsOption = { lifetime: 'SINGLE' }) {
 

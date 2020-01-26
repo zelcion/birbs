@@ -38,14 +38,15 @@ export class Context {
   /**
    * Executes an Executable entity
    * @param name Identifier of what needs to be triggered in this context
+   * @param descriptable Additional Information to be sent to the Birbable
    */
-  public trigger (name : string) : this {
+  public trigger (name : string, descriptable?) : this {
     if (!this.__birbables.has(name)) {
       return this;
     }
 
     this.__unmount(this.__birbables.get(name));
-    this.__emitter.emit(name, this);
+    this.__emitter.emit(name, this, descriptable);
     return this;
   }
 
