@@ -22,10 +22,12 @@ describe('[ BIRBS API ]', () => {
     }
 
     const procedureCreated = new TestProcedure({lifetime: 'DURABLE' });
-    const contextCreated = new TestContext();
+
+    const contextId = 'Context';
+    const contextCreated = new TestContext(contextId);
     const manager = new EventManager();
 
-    manager.addContext(contextCreated).addProcedure(procedureCreated, 'TestContext');
+    manager.addContext(contextCreated).addProcedure(procedureCreated, contextId);
 
     manager.broadcast('TestProcedure');
     expect(contextCreated.text).to.be.equal('text 1');
@@ -75,7 +77,7 @@ describe('[ BIRBS API ]', () => {
       .addStep(divideProcedure)
       .addStep(microAddProcedure);
 
-    const numberContext = new NumberContext().sign(pipeline);
+    const numberContext = new NumberContext('aa').sign(pipeline);
 
     numberContext.trigger('AddToCounter');
     expect(numberContext.currentCounter).to.be.equal(10);
@@ -98,7 +100,7 @@ describe('[ BIRBS API ]', () => {
     }
 
     const helloizer = new Helloizer({ lifetime: 'SINGLE'});
-    const context = new TestContext().sign(helloizer);
+    const context = new TestContext('aa').sign(helloizer);
 
     context.trigger('Helloizer');
     expect(context.text).to.be.equal('Hello! i am a test text texst');
@@ -119,7 +121,7 @@ describe('[ BIRBS API ]', () => {
     }
 
     const helloizer = new Helloizer({ lifetime: 'DURABLE'});
-    const context = new TestContext().sign(helloizer);
+    const context = new TestContext('aa').sign(helloizer);
 
     context.trigger('Helloizer');
     expect(context.text).to.be.equal('Hello! i am a test text texst');
@@ -157,7 +159,7 @@ describe('[ BIRBS API ]', () => {
     const goodbyzer = new Goodbyzer({ group: groupToken, lifetime: 'DURABLE'});
     const mehizer = new Mehizer({ group: groupToken, lifetime: 'DURABLE'});
 
-    const context = new TestContext();
+    const context = new TestContext('aa');
     context.sign(helloizer).sign(goodbyzer).sign(mehizer);
 
     // context[helloizer.identifier];

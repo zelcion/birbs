@@ -5,14 +5,18 @@ import { Context } from './context';
  * Holds Contexts and broadcasts events to them
  */
 export class EventManager {
-  private _contexts : Map<string, Context> = new Map();
+  /**
+   * @private
+   * @readonly A Map of added contexts
+   */
+  private readonly __contexts : Map<string, Context> = new Map();
 
   /**
    * Adds a context to this event manager.
    * @param context
    */
   public addContext(context : Context) : EventManager {
-    this._contexts.set(context.constructor.name, context);
+    this.__contexts.set(context.identifier, context);
     return this;
   }
 
@@ -21,7 +25,7 @@ export class EventManager {
    * @param contexName
    */
   public removeContext(contexName : string) : EventManager {
-    this._contexts.delete(contexName);
+    this.__contexts.delete(contexName);
     return this;
   }
 
@@ -32,10 +36,10 @@ export class EventManager {
    */
   public broadcast(birbable : string, context ?: string) : EventManager {
     const chosenContext = (context !== undefined)?
-      this._contexts.get(context) : undefined;
+      this.__contexts.get(context) : undefined;
 
     if (chosenContext === undefined) {
-      this._contexts.forEach(
+      this.__contexts.forEach(
         (selectedContext) => {
           selectedContext.trigger(birbable);
         }
@@ -54,7 +58,7 @@ export class EventManager {
    * @param context The context to add the birbable to
    */
   public addProcedure(birbable : Birbable, context : string) : EventManager {
-    this._contexts.get(context).sign(birbable);
+    this.__contexts.get(context).sign(birbable);
     return this;
   }
 
@@ -63,8 +67,8 @@ export class EventManager {
    * @param birbable The birbable to remove
    * @param context The context to remove the birbable from
    */
-  public removeProcedure(birbable : Birbable, context : string) : EventManager {
-    this._contexts.get(context).unsign(birbable);
+  public removeBirbable(birbable : Birbable, context : string) : EventManager {
+    this.__contexts.get(context).unsign(birbable);
     return this;
   }
 };

@@ -6,9 +6,13 @@ import { Procedure } from './procedure';
  * Birbable entity used to run a sequence of Procedures
  */
 export abstract class Pipeline extends BirbsRunnable {
+  /**
+   * A property used to assert the type of the Birbable
+   * @readonly
+   */
   public readonly __type = 'PIPELINE';
 
-  private steps : Map<string, Procedure> = new Map();
+  private readonly steps : Map<string, Procedure> = new Map();
   private readonly onFinish ?: CallableFunction;
   private readonly onFail ?: CallableFunction;
 
