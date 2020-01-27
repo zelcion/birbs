@@ -27,7 +27,7 @@ describe('[ BIRBS API ]', () => {
     const contextCreated = new TestContext(contextId);
     const manager = new EventManager();
 
-    manager.addContext(contextCreated).addProcedure(procedureCreated, contextId);
+    manager.addContext(contextCreated).addBirbable(procedureCreated, contextId);
 
     manager.broadcast('TestProcedure', contextId, 8);
     expect(contextCreated.text).to.be.equal('text 1');

@@ -58,7 +58,7 @@ export class EventManager {
    * @param birbable The birbable to add
    * @param context The context to add the birbable to
    */
-  public addProcedure(birbable : Birbable, context : string) : EventManager {
+  public addBirbable(birbable : Birbable, context : string) : EventManager {
     this.__contexts.get(context).sign(birbable);
     return this;
   }

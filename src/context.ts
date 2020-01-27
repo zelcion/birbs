@@ -43,7 +43,7 @@ export class Context {
   }
 
   /**
-   * Executes an Executable entity
+   * Triggers the execution of a signed `Birbable`.
    * @param name Identifier of what needs to be triggered in this context
    * @param descriptable Additional Information to be sent to the Birbable
    */

@@ -8,8 +8,8 @@ const funnyPeopleRoom = new ChatRoom('Only Funny People Allowed', funnyPeopleRoo
 
 manager.addContext(coolPeopleRoom).addContext(funnyPeopleRoom);
 
-manager.addProcedure(MessagePipeline, coolPeopleRoomId);
-manager.addProcedure(MessagePipeline, funnyPeopleRoomId);
+manager.addBirbable(MessagePipeline, coolPeopleRoomId);
+manager.addBirbable(MessagePipeline, funnyPeopleRoomId);
 
 const james = new User('James');
 const robert = new User('Robert');
