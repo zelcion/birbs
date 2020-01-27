@@ -1,503 +1,191 @@
-# Birbs 
 [![Build Status](https://travis-ci.org/flgmjr/birbs.svg?branch=master)](https://travis-ci.org/flgmjr/birbs)
 
-Capture and admire all your joyful events with this event manager and encapsulator!
+# Birbs 
 
---------------------
-#### A Quick Heads'up
+Capture and admire all your joyful events with this event manager!
 
-> We will soon update to version `0.5`, which will be the first production-ready package!
-> Is there something you would like to see in Birbs? I'd like to hear it! [Tell me!](https://github.com/flgmjr/birbs/issues/new)
+-------
+## What is Birbs?
+Birbs is a tool to help you deal with events in a semantic declarative fashion. With it, it is possible to decouple your application without losing track of the whole process as a business perspective, while also keeping the code organized.
 
-------------------
-## Table of Contents
-- [Why Birbs?](https://github.com/flgmjr/birbs#what-is-birbs-why-birbs)
-- [Examples](https://github.com/flgmjr/birbs#example-chat-application-js)
-- [API Reference](https://github.com/flgmjr/birbs#api-reference)
-  - [EventManager](https://github.com/flgmjr/birbs#eventmanager)
-  - [Context](https://github.com/flgmjr/birbs#context)
-  - [Procedure](https://github.com/flgmjr/birbs#procedure)
-  - [Effect](https://github.com/flgmjr/birbs#effect)
-- [Roadmap](https://github.com/flgmjr/birbs#roadmap)
+## Ok, But Why Birbs?
+Whenever programming or designing any application, we need to setup communication and data transferring between multiple parts of it. The problem comes when a system meets the barrier all systems face at some point: The manageability of complex Interfaces, the increasing number of classes and how to maintain them decoupled. As long as that codebase keeps enlarging, we know it gets harder to keep it [SOLID](https://en.wikipedia.org/wiki/SOLID).
 
-## What is Birbs? Why Birbs?
+Although Node's plain events can be more than enough to get that desired decoupling, it could also do better! Birbs provides the funcionality of Node's events with a sweet sweet interface that requires almost no extra work to be done!
 
-Birbs is an Event encapsulator that gives context and extensibility to Node's plain events. Its objective is to bring the marvels of encapsulation and polymorphism of OOP into the world of Events, and doing that in an easily pluggable fashion!
+## And How Does That Work? 
+Birbs gives context and extensibility to Node's events.
 
-By encapsulating your application's events, it is possible to control all the flow of your application and decouple many parts of it, allowing you to reuse your routines and procedures and make them have different impacts depending on the context they're in. Let's say for example you have a Super Market application. There you have a `MeatDepartment` domain and a `FruitDepartment` domain. For theese both you need a function or method called `getWeight()`. With birbs it is possible to have a `Procedure` with this name, and use it to either weight Meat or Fruits!
+This library proposes that an Event and the effect it has in your application should be self contained. This means that your Event represents the modification to the context and to the state of your application.
 
-Having that kind of use in mind, Birbs is designed to be effortlessly pluggable in your already mature application, or help you develop a new one, entirely event-oriented from scracth, for you to have a much more wholesome (and controlled) experience when dealing with events. 
+For instance, let's say we have a Supermarket Application. We would need a `MeatDepartment` domain and a `FruitDepartment` domain; They would be Contexts of our application. For these both, we need a function or method called `weightProduct()`. With Birbs we can have a `Procedure` for this task, and execute it in any of the contexts.
 
-Also, it is internally built on Node's internal robust events engine, and got no other dependency at all!
-
-Oh, it also uses typescript!
+The Procedure of wheighting the products makes a modification to the context they're in. For example, it could set a property of the context `measuredProductsWeight`, used when the checkout is wanted
 
 ## How to install?
 ```
 npm i birbs --save
 ```
 
-## Example: Chat Application _[js]_
->_For a more detailed explanation of each class, refer to the `API Reference` section._
+-----
+## Pratical Examples:
+### **Messaging Application:** *Notifications [Js]*
 
 Let's say here we got to do a chat Application. We would like to have the features of different Rooms and message notifications!
 
 For the sake of simplicity, we will not create all the servers and routes, just execute it in Node directly.
 
-1. Let's create the class for our `ChatRoom`!
-   ```javascript
-   // ChatRoom.js
+----
+# API Reference:
+Before we get started, let's get to know our entities. There's `Context`, `Procedure`, `Pipeline`, and `EventManager`.
 
-   import { Context } from 'birbs'
-   //          or
-   const { Context } = require('birbs');
+> When saying `Birbable`, it means either a Procedure or a Pipeline.
 
-   module.exports = class ChatRoom extends Context {
-     constructor (name) {
-       super();
-       this.chatRoomName = name;
-       this.messages = [];
-       this.participants = [];
-     }
+If your IDE or editor shows you properties or methods which are not documented, it means that they are private, nd you should not use them directly.
 
-     receive (user) {
-       this.participants.push(user);
-     }
+## Context : **_class_**
+A Context defines a group of information available to a Procedure or Pipeline when it gets executed. It may have any Bibrbable instance signed on it.
 
-     post (message) {
-       this.messages.push(message);
+The constructor takes a string as an Identifier, used to map the context in a `Manager`.
 
-       // Later we will notify our users here! ;)
-     }
+### Context.identifier  ~~---~~  **_readonly property : string_**
+Identifier of the context.
 
-     get latestMessage () {
-       return this.messages[this.messages.length -1];
-     }
-   }
-   ```
-   Extending Context means that the class contains relevant data and information about the domain it's talking about, or means that it represents the domain itself.
+### Context.trigger()  ~~---~~  **_method : this_**
+Triggers the execution of a signed `Birbable`. Accepts as an argument a signed birbable name and optionally, extra information to be passed to the birbable to be triggered.
+```javascript
+context.trigger('Birbable Name', extraInfo);
+```
 
-   Later on you will realize that all the wiring can be done outside of the class files, so it's possible to use all the features Birbs can provide without having it standing between you and your application.
+### Context.sign()  ~~---~~  **_method : this_**
+Signs a Birbable in this context. Accepts a Birbable as an argument.
+```javascript
+context.sign(BirbableEntity);
+```
 
-2. Now let's also create the `User` and `Message`.
-   ```javascript
-   // User.js
-   module.exports = class User {
-      constructor (userName) {
-        this.userName = userName;
-        this.messagesWritten = [];
-        this.unreadNotifications = [];
-        this.currentChatRoom = null;
-      }
+### Context.unsign()  ~~---~~  **_method : this_**
+Removes a Birbable from this context. Accepts a Birbable as an argument.
+```javascript
+context.unsign(BirbableEntity);
+```
 
-      join (chatRoom) {
-        chatRoom.receive(this);
-        this.currentChatRoom = chatRoom;
-      }
+## Procedure : **_abstract class_** - Birbable
+Is the unit that contains the instructions to change data or a state of the application. Must be executed in a context through the `.trigger()` method.
 
-      writeMessage (messageContent) {
-        const aMessage = new Message(
-          messageContent, this.userName
-        );
+This class is supposed to be extended so you can add your own implementation of the `.execute()` method.
 
-        this.currentChatRoom.post(aMessage);
-      }
-   };
-   ```
+### Procedure.__type  ~~---~~  **_readonly property : "PROCEDURE"_**
+Type of birbable. Used internally to do assertions.
 
-   ```javascript
-   // Message.js
-   class Message {
-     constructor (content, author) {
-       this.content = content;
-       this.author = author;
-     }
-   }
-   ```
+### Procedure.lifetime  ~~---~~  **_readonly property : string_**
+Lifetime of the Birbable, can be either `"DURABLE"` OR `"SINGLE"`. `"DURABLE"` means the Birbable will be able to be used on a context until it gets manually removed with `.unisgn()`; `"SINGLE"` lifetime birbables can only be executed once per `sign()`.
 
-3. We already have the main functionality, now let's add our application's `Procedures` and `Effects`.
-   ```javascript
-   // NotificationProcedure.js
-   import { Procedure } from 'birbs'
-   //          or
-   const { Procedure } = require('birbs');
+### Procedure.group  ~~---~~  **_readonly property : symbol_**
+Procedures and Pipelines can have this property set at the constructor. If a Birbable with this property set is triggered, all of the other belonging with the same group get removed as well.
 
-   module.exports = class NotificationProcedure extends Procedure {
-     constructor (baseMessage) {
-       super();
-       this.baseMessage = baseMessage;
-     }
-   }
-   ```
-   We'll just add a custom notification message in this procedure for now.
+### Procedure.belongsToGroup  ~~---~~  **_readonly property : boolean_**
+Wether this Birbable belongs to a group or not.
 
-   ```javascript
-   // LogNotificationEffect.js
-   module.exports = class NotifyNewMessage {
-     execution(notification) {
-       // This method recieves as an arugment the Procedure
-       // it belongs, and is bound to the context it's fired at.
+### Procedure.execute()  ~~---~~  **_abstract async method : Promise(void)_**
+Is the method that contains the change to be made when the Birbable gets triggered.
 
-       console.log(
-         `${notification.baseMessage}
-          room: ${this.chatRoomName}
-          author: ${this.latestMessage.author}
-          message: ${this.latestMessage.content}`
-       );
-     }
-   }
-   ```
-   We call the classes with `execute(Procedure)` Effects. If we would be using typescript, we would need to `implement` it.
+Context is the context in which the procedure was triggered, while the descriptable is an optional argument containing extra data to be used in that execution.
 
-4. Let's wire everything up!
+**Attention!** - This method requires to be declared and implemented by you.
 
-   Until now we have just programmed our application as we would if we did not use Birbs, afterall we just extended our classes.
+```javascript
+Procedure.execute(context, descriptable?);
+```
 
-   That is a good thing for us, it means that you can use Birbs without having to worry about it most of the time, but now we will need to set our events (Procedures) and Contexts to be used!
+## Pipeline : **_abstract class_** - Birbable
+Contains a sequential set of instructions. Must be executed in a context through the `.trigger()` method.
 
-   ```javascript
-   // main.js
-   // Import/Require all extended Classes here
+This class is supposed to be extended, but you **MUST NOT** override its `execute()` method.
 
-   // setup your Notification Procedure
-   const notificationId = Symbol('notification');
-   const notifyNewMessages = new NotificationProcedure('New message received!')
-     .withIdentifier(notificationId)
-     .withLifecycle('permanent')
-     .withEffect(new NotifyNewMessage())
-     .build()
+The constructor accepts as arguments:
+ - options: The options of the Birbable
+ - onFinish: Callback executed when the pipeline finishes, which receives as argument the context.
+ - onFail: If any of the procedures promises get rejected, this function will be called, or an error will be thrown
 
-   // setup your rooms
-   const coolPeopleRoomId = Symbol('coolPeople')
-   const coolPeopleRoom = new ChatRoom('Cool People')
-     .withIdentifier(coolPeopleRoomId)
-     .withStrategy('no-flush')
-     .withProcedures(notifyNewMessages)
-     .build();
-   
-   const funnyPeopleRoomId = Symbol('funnyPeople')
-   const funnyPeopleRoom = new ChatRoom('Funny People')
-     .withIdentifier(funnyPeopleRoomId)
-     .withStrategy('no-flush')
-     .withProcedures(notifyNewMessages)
-     .build();
-   ```
-   You probably realized the use of `Symbol()`. Birbs uses symbols internally to ensure unique keys and identifiers, so even if you might mess up and give two things the same name, Birbs will know their difference. Also, Symbols enable you to get a better decoupling because you will never really need to refer to the original class instance more than once.
+```javascript
+new Pipeline(option, onFinish?, onFail?);
+```
 
-   Oh, let's not forget to change our comment on the `ChatRoom` class!
+### Pipeline.__type  ~~---~~  **_readonly property : "PIPELINE"_**
+Type of birbable. Used internally to do assertions.
 
-   ```javascript
-   // ChatRoom.js
-   {...}
+### Pipeline.lifetime  ~~---~~  **_readonly property : string_**
+Lifetime of the Birbable, can be either `"DURABLE"` OR `"SINGLE"`. `"DURABLE"` means the Birbable will be able to be used on a context until it gets manually removed with `.unisgn()`; `"SINGLE"` lifetime birbables can only be executed once per `sign()`.
 
-   post (message) {
-       this.messages.push(message);
+### Pipeline.group  ~~---~~  **_readonly property : symbol_**
+Pipelines and Pipelines can have this property set at the constructor. If a Birbable with this property set is triggered, all of the other belonging with the same group get removed as well.
 
-       // You will need a reference to the
-       // id of your procedure when executing it.
-       this.trigger(notificationId);
-   }
-   ```
+### Pipeline.belongsToGroup  ~~---~~  **_readonly property : boolean_**
+Wether this Birbable belongs to a group or not.
 
-5. We are ready! Let's chat!
+### Pipeline.addStep  ~~---~~  **_method : this_**
+Adds a Birbable to be executed in the pipeline. They are executed in the order they were added.
 
-    ```javascript
-    // app.js
+```javascript
+Pipeline.addStep(BirbableEntity);
+```
 
-    const james = new User('James');
-    const robert = new User('Robert');
-    const mary = new User('Mary');
-    const nancy = new User('Nancy');
+### Pipeline.execute()  ~~---~~  **_async method : Promise(void)_**
+It is the method that triggers the pipeline.
 
-    james.join(coolPeopleRoom);
-    mary.join(funnyPeopleRoom);
+Context is the context in which the Pipeline was triggered, while the descriptable is an optional argument containing extra data to be used in that execution.
 
-    // See the magic happen!
-    james.writeMessage('Hello World!');
-    mary.writeMessage('Hey Everyone!');
-    ```
+```javascript
+Pipeline.execute(context, descriptable?);
+```
 
--------
-# API Reference
-
-Before everything, let's talk about our names. In birbs there are four important names for you to know: `EventManager`, `Context`, `Procedure`, and `Effect`. EventManager is the easier one to understand, it's the entity that you can use to broadcast an event to a context withoutt having any reference to neither, just their Ids.
-
-Now for the other three, it is better to first understand their relation. Contexts have Procedures to use or execute in its lifetime. Procedures each have at least one Effect to be triggered when needed. Context don't know about Effects, but Effects have direct references to the context that triggered their procedure. When a procedure is used, the control is passed from the context, to the procedure, into the effect.
-
-#### Notes:
-- Birbs has native support for typescript.
-- Birbs classes does not use Constructors, they use builders.
-
-## EventManager
+## EventManager : **_class_**
 It is the entity that you can use to trigger a Procedure in a Context. It is also possible to use it as a context group.
 
+This special entity should be used whenever possible to broadcast birbables since it enables to trigger them without a reference.
+
 ### EventManager.addContext()
-_Adds a context to an EventManager. Returns the EventManager_
+Adds a context to an EventManager. Returns the EventManager
 
 ```javascript
   EventManager.addContext(context: Context);
 ```
 
 ### EventManager.removeContext()
-_Removes a context from an EventManager. Returns the EventManager_
+Removes a context from an EventManager. Returns the EventManager
 
 ```javascript
-  EventManager.removeContext(context: Context | symbol);
-```
-
-### EventManager.fetchContext()
-_fetches a context from an EventManager. Returns a Context or undefined_
-
-```javascript
-  EventManager.fetchContext(contextIdentifier: symbol);
+  EventManager.removeContext(context: string);
 ```
 
 ### EventManager.broadcast()
-_Triggers a Procedure execution. Returns the EventManager_
+Triggers a Procedure execution. Returns the EventManager
 
 The context argument is optional. If ommited, the manager will try triggering the Procedure in all of its Contexts
 
 ```javascript
   EventManager.broadcast(
-    procedure : Procedure | symbol,
-    context ?: Context | symbol
+    birbable : string,
+    context ?: string,
+    descriptable ?: any
   );
 ```
-### EventManager.addProcedure()
-_Adds a Procedure to a Context. Returns the EventManager_
+### EventManager.addBirbable()
+Adds a Birbable to a Context. Returns the EventManager
 
 ```javascript
-  EventManager.addProcedure(
-    procedure : Procedure,
+  EventManager.addBirbable(
+    birbable : Birbable,
     context : Context | symbol
   );
 ```
 
 ### EventManager.removeProcedure()
-_Removes a Procedure to a Context. Returns the EventManager_
+Removes a Birbable from a Context. Returns the EventManager
 
 ```javascript
   EventManager.removeProcedure(
-    procedure : Procedure,
+    birbable : string,
     context : Context | symbol
   );
 ```
-
-## Context
-Context is the entity that holds the data that defines a domain in you application, or is the domain itself. For example, our `MeatDepartment` would need the available meat cuts and the clients we're serving.
-
-The Context can be accessed in the Effect by using the `this` keyword.
-
-Contexts have a special mechanics which is the FlushStrategy. Whenever the Context triggers a Procedure, it needs to be either discarded (if the procedure is 'ephemeral'), or maintained (if it is 'permanent'). The FlushStrategy is set to choose whether to discard all ephemeral Procedures when any Procedure of it is triggered or to not discard any. The logic goes like the following:
-
-| Procedure Type | Context Strategy | Result                                    |
-|----------------|------------------|-------------------------------------------|
-| "ephemeral"    | "no-flush"       | Only the triggered Procedure is discarded |
-| "ephemeral"    | "each-trigger"   | All "ephemeral" Procedures are discarded  |
-| "permanent"    | "no-flush"       | No Procedures discarded                   |
-| "permanent"    | "each-trigger"   | All "ephemeral" Procedures are discarded  |
-
-Triggered "ephemeral" Procedures are always discarded, while "permanent" are never discarded.
-
-Contexts need to be built to use. Here we will cover the building methods.
-
-### ContextBuilder.withIdentifier()
-_Adds the identifier to the context that is to be built._
-_Returns the ContextBuilder._
-This is required to build the context.
-
-You can either create the symbol and use it in this modifier or input a string and retrieve the synbol of it later with `.identifier`.
-
-```javascript
-  ContextBuilder.withIdentifier(identifier: symbol | string) ;
-```
-
-### ContextBuilder.withProcedures()
-_Adds procedures to the context that is to be built._
-_Returns the ContextBuilder._
-
-```javascript
-  ContextBuilder.withProcedures(procedure: Procedure | Procedure[]);
-```
-
-### ContextBuilder.withStrategy()
-_Sets the flushing strategy of the context that is to be built._
-_Returns the ContextBuilder._
-this is required to build the Context.
-
-```javascript
-  ContextBuilder.withProcedures(procedure: Procedure | Procedure[]);
-```
-
-### ContextBuilder.build()
-_Apply all modifications added and returns the built context._
-
-This builder method also accepts an optional argument that can be used as a "lazy" builder. You can input it with an object with the following parameters (all optional):
-```javascript
-{
-  identifier : symbol | string,
-  strategy : string
-}
-```
-The lazy builder has priority when using alongside the normal builder. This means that if there is an `identifier` already set with modifications, it will be overriten by the lazy builder's `identifier`.
-```javascript
-  ContextBuilder.build();
-```
-
-### Context.sign()
-_Signs a procedure in the context. Returns the context_
-
-```javascript
-  Context.sign(procedure: Procedure);
-```
-
-### Context.resign()
-_Resigns/Removes a procedure from the context. Returns the context_
-
-```javascript
-  Context.resign(procedure: Procedure);
-```
-
-### Context.getProcedure()
-_Fetches a procedure by its Identifier. Returns a procedure or undefined_
-
-```javascript
-  Context.getProcedure(procedureId: symbol);
-```
-
-### Context.hasProcedure()
-_Checks if the context has a procedure. Returns a boolean_
-
-```javascript
-  Context.hasProcedure(procedureId: symbol | Procedure);
-```
-
-### Context.flushingStrategy > _getter_
-_Gets the context's flushing strategy_
-
-### Context.identifier > _getter_
-_Gets the context's identifier_
-
-### Context.identifierName > _getter_
-_Gets the string of a context's identifier_
-
-## Procedure
-Procedure is the entity that encapsulates or groups a set of informations and fields regarding an action that your application takes. For example, throwing an especific error could be a valid procedure, Logging out an user could be one as well.
-
-Procedures has an important property "Lifecycle", which sets the execution type of it. If you set it to `ephemeral`, the procedure can be executed only once per sign (when it's signed in a context). If you set it to `permanent`, it will stay there until resigned.
-
-Procedures also have a builder.
-
-### ProcedureBuilder.withIdentifier()
-_Adds the identifier to the procedure that is to be built._
-_Returns the ProcedureBuilder._
-This is required to build the Procedure
-
-You can either create the symbol and use it in this modifier or input a string and retrieve the synbol of it later with `.identifier`.
-```javascript
-  procedureBuilder.withIdentifier(identifier: symbol | string);
-```
-
-### ProcedureBuilder.withLifecycle()
-_Sets the type of the procedure that is to be built._
-_Returns the ProcedureBuilder._
-This is required to build the Procedure
-
-type can be either "ephemeral" or "permanent".
-
-```javascript
-  procedureBuilder.withLifecycle(type: string);
-```
-
-### ProcedureBuilder.withEffect()
-_Adds an Effect to the procedure that is to be built._
-_Returns the ProcedureBuilder._
-This is required to build the Procedure
-
-```javascript
-  procedureBuilder.withEffect(effect: Effect);
-```
-
-### ProcedureBuilder.build()
-_Apply all modifications added and returns the built procedure._
-
-This builder method also accepts an optional argument that can be used as a "lazy" builder. You can input it with an object with the following parameters (all optional):
-```javascript
-{
-  identifier : symbol | string,
-  lifecycle : string,
-  effects : Effect[],
-}
-```
-The lazy builder has priority when using alongside the normal builder. This means that if there is an `identifier` already set with modifications, it will be overriten by the lazy builder's `identifier`.
-
-```javascript
-  ProcedureBuilder.build();
-```
-
-### Procedure.lifecycle > _getter_
-_gets the procedure's lifecycle type._
-
-### Procedure.effects > _getter_
-_gets the procedure's effects (Array)_
-
-### Procedure.identifier > _getter_
-_gets the procedure's identifier_
-
-## Effect
-Our last entity is the most simple one. It's not even a concrete class. Effect is the representation of a part of a Procedure. We called it Effect since we're working with events here, it's the _Effect_ of a Procedure happening in your application.
-
-If you're working with Javascript, you can write your effect by just placing a method on a class or object called `execution()`. In typescript, import it and have your Effect `implements` it.
-
-`execution()` Must be unbound.
-
-An important thing to notice is that it is possible to have multiple Effects in a Procedure, and if that is the case, they are all executed in parallel.
-
-### Effect's execution interface:
-The method recieves one parameter that is the Procedure it belongs, and has the context that its Procedure was triggered bound to it. This means that we have a single argument and when we type `this`, we are reffering to a context.
-
-```javascript
-execution(procedure : Procedure) {
-  console.log(procedure) // Logs the procedure
-  console.log(this) // Logs the context
-}
-```
-
-## Utils
-We have packaged some helper functions for you to use with birbs. Here's their examples and references.
-
-### `utils.toNewEffect()`
-_Creates an Effect from the function input. and returns it_
-
-This function accepts a single argument, which is another function or a callback which you want to turn into an Effect. Keep in mnind that using this function is not recommended when building new applications, it shines the most when used in mature applications to start implementing birbs to its full potential.
-
-The argument must be an unbound function.
-
-```javascript
-import { utils } from 'birbs';
-
-function hello (procedure) {
-  console.log(`hello ${procedure.name}`);
-};
-
-const helloEffect = utils.toNewEffect(hello);
-// helloEffect now can be used in ".withEffect()"
-```
-
--------
-# Roadmap / Changelog
-Hey! You got till the end!
-I hope you liked this package and it's being useful for you. Now let's check what is next!
-
-- **v0.5**
-  - Have more reliable tests;
-  - ~~More strict entity checks to avoid unexpected states~~;
-  - ~~Have a short builder that accepts an object with the options~~;
-  - ~~Also accept strings in the `.withIdentifier()` clauses~~;
-  - ~~Have a helper function that makes a method or function into an Effect~~;
-- **v0.6**
-  - Add Pipeline Entity (Sequential effects);
-- **v0.7**
-  - Add Event History;
-  
-You are very welcome to contribute to this list! just head to the [gitHub Page](https://github.com/flgmjr/birbs/issues/new)!
