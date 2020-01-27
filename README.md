@@ -29,11 +29,11 @@ npm i birbs --save
 
 -----
 ## Pratical Examples:
-### **Messaging Application:** *Notifications [Js]*
+### [**Messaging Application:** *Notifications [Js]*](https://github.com/flgmjr/birbs/tree/master/pratical-examples/messaging-js)
 
 Let's say here we got to do a chat Application. We would like to have the features of different Rooms and message notifications!
 
-For the sake of simplicity, we will not create all the servers and routes, just execute it in Node directly.
+For the sake of simplicity, we will not create all the servers and routes, just execute it in Node directly. Take a look on the linked folder above or [here](https://github.com/flgmjr/birbs/tree/master/pratical-examples/messaging-js).
 
 ----
 # API Reference:
