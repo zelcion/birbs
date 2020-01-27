@@ -15,8 +15,6 @@ module.exports = class ChatRoom extends Context {
 
   post (message) {
     this.messages.push(message);
-
-    manager.broadcast('NotificationProcedure', this.identifier);
   }
 
   get latestMessage () {

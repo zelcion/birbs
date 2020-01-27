@@ -1,6 +1,13 @@
 import { Birbable } from './types';
 import { EventEmitter } from 'events';
 
+class CustomEmitter extends EventEmitter {
+  constructor(listeners) {
+    super();
+    this.setMaxListeners(listeners);
+  }
+};
+
 /**
  * Context defines a group of information available to a Procedure when
  * it gets executed. A context may have any Bibrbable instance signed on it.
@@ -14,7 +21,7 @@ export class Context {
   /**
    * @readonly @private Local EventEmmiter instance
    */
-  private readonly __emitter : EventEmitter = new EventEmitter();
+  private readonly __emitter : EventEmitter = new CustomEmitter(100);
 
   /**
    * @readonly @private Map of Birbables registered in the context

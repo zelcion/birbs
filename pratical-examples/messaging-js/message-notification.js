@@ -6,14 +6,14 @@ module.exports = class NotificationProcedure extends Procedure {
     this.baseMessage = baseMessage;
   }
 
-  execute(context) {
+  async execute(context, message) {
     console.log(
       `${this.baseMessage}\n` +
       ` - room: ${context.chatRoomName}\n` +
-      ` - author: ${context.latestMessage.author}\n` +
-      ` - message: ${context.latestMessage.content}`
+      ` - author: ${message.author}\n` +
+      ` - message: ${message.content}`
     );
 
-    console.log(`\n [ Message visible to ${context.participants.length} user(s) ] \n`)
+    console.log(`\n [ Message visible to ${context.participants.length} user(s) ] \n`);
   }
 }

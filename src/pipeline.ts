@@ -41,8 +41,10 @@ export abstract class Pipeline extends BirbsRunnable {
     this.onFinish = onFinish;
     this.onFail = onFail;
 
+    this.addStep = this.addStep.bind(this);
     this.execute = this.execute.bind(this);
     this.runPipeline = this.runPipeline.bind(this);
+    this.catchFail = this.catchFail.bind(this);
   }
 
   private catchFail () : (error : Error) => void {
@@ -54,6 +56,7 @@ export abstract class Pipeline extends BirbsRunnable {
   }
 
   private async runPipeline(executionList : Birbable[], context : Context, descriptable?) : Promise<void> {
+
     for (const birbable of executionList) {
       await birbable.execute(context, descriptable).catch(this.catchFail());
     }

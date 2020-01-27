@@ -1,4 +1,5 @@
 const Message = require("./message");
+const { manager } = require('./config');
 
 module.exports = class User {
   constructor (userName) {
@@ -10,7 +11,7 @@ module.exports = class User {
 
   join (chatRoom) {
     chatRoom.receive(this);
-    this.currentChatRoom = chatRoom;
+    this.currentChatRoom = chatRoom.identifier;
   }
 
   writeMessage (messageContent) {
@@ -18,6 +19,6 @@ module.exports = class User {
       messageContent, this.userName
     );
 
-    this.currentChatRoom.post(aMessage);
+    manager.broadcast('MessagePipeline', this.currentChatRoom, aMessage);
   }
 }
