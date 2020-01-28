@@ -16,7 +16,7 @@ export class Context {
   /**
    * @readonly @private identifier of the context entity
    */
-  private readonly __identifier : string;
+  private readonly __identifier : string | symbol;
 
   /**
    * @readonly @private Local EventEmmiter instance
@@ -31,14 +31,14 @@ export class Context {
   /**
    * @returns identifier of the context entity
    */
-  public get identifier () : string {
+  public get identifier () : string | symbol {
     return this.__identifier;
   }
 
   /**
    * @param identifier The value to set the local identifier of the context
    */
-  public constructor (identifier : string) {
+  public constructor (identifier : string | symbol) {
     this.__identifier = identifier;
   }
 

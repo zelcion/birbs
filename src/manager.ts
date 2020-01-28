@@ -9,7 +9,7 @@ export class EventManager {
    * @private
    * @readonly A Map of added contexts
    */
-  private readonly __contexts : Map<string, Context> = new Map();
+  private readonly __contexts : Map<string | symbol, Context> = new Map();
 
   /**
    * Adds a context to this event manager.
@@ -24,7 +24,7 @@ export class EventManager {
    * Removes a context from this event manager.
    * @param contexName
    */
-  public removeContext(contexName : string) : EventManager {
+  public removeContext(contexName : string | symbol) : EventManager {
     this.__contexts.delete(contexName);
     return this;
   }
@@ -35,7 +35,7 @@ export class EventManager {
    * @param context Optional - the context to trigger the Birbable
    * @param descriptable Optional - Additional info to be sent to the Birbable
    */
-  public broadcast(birbable : string, context ?: string, descriptable?) : EventManager {
+  public broadcast(birbable : string, context ?: string | symbol, descriptable?) : EventManager {
     const chosenContext = (context !== undefined)?
       this.__contexts.get(context) : undefined;
 
@@ -58,7 +58,7 @@ export class EventManager {
    * @param birbable The birbable to add
    * @param context The context to add the birbable to
    */
-  public addBirbable(birbable : Birbable, context : string) : EventManager {
+  public addBirbable(birbable : Birbable, context : string | symbol) : EventManager {
     this.__contexts.get(context).sign(birbable);
     return this;
   }
@@ -68,7 +68,7 @@ export class EventManager {
    * @param birbable The birbable to remove
    * @param context The context to remove the birbable from
    */
-  public removeBirbable(birbable : Birbable, context : string) : EventManager {
+  public removeBirbable(birbable : Birbable, context : string | symbol) : EventManager {
     this.__contexts.get(context).unsign(birbable);
     return this;
   }

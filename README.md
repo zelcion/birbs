@@ -48,7 +48,7 @@ A Context defines a group of information available to a Procedure or Pipeline wh
 
 The constructor takes a string as an Identifier, used to map the context in a `Manager`.
 
-### Context.identifier  ~~---~~  **_readonly property : string_**
+### Context.identifier  ~~---~~  **_readonly property : string | symbol_**
 Identifier of the context.
 
 ### Context.trigger()  ~~---~~  **_method : this_**

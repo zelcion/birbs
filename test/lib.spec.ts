@@ -23,7 +23,7 @@ describe('[ BIRBS API ]', () => {
 
     const procedureCreated = new TestProcedure({lifetime: 'DURABLE' });
 
-    const contextId = 'Context';
+    const contextId = Symbol('Context');
     const contextCreated = new TestContext(contextId);
     const manager = new EventManager();
 
