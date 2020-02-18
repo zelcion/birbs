@@ -1,4 +1,5 @@
 import { describe, it } from 'mocha';
+import { BroadcastsRecorder } from '../src/broadcasts-recorder';
 import { Context } from '../src/context';
 import { EventManager } from '../src/manager';
 import { expect } from 'chai';
@@ -25,7 +26,8 @@ describe('[ BIRBS API ]', () => {
 
     const contextId = Symbol('Context');
     const contextCreated = new TestContext(contextId);
-    const manager = new EventManager();
+    const broadcastController = new BroadcastsRecorder();
+    const manager = new EventManager(broadcastController);
 
     manager.addContext(contextCreated).addBirbable(procedureCreated, contextId);
 
@@ -35,6 +37,8 @@ describe('[ BIRBS API ]', () => {
     manager.broadcast('TestProcedure');
     expect(contextCreated.text).to.be.equal('text 19');
 
+    expect(manager.broadcasts.dump().length).to.be.equal(2);
+    expect(manager.broadcasts.dump().length).to.be.equal(0);
   });
 
   it('Pipelines executes in order', (done) => {

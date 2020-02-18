@@ -142,7 +142,7 @@ Pipeline.execute(context, descriptable?);
 ## EventManager : **_class_**
 It is the entity that you can use to trigger a Procedure in a Context. It is also possible to use it as a context group.
 
-This special entity should be used whenever possible to broadcast birbables since it enables to trigger them without a reference.
+This special entity should be used whenever possible to broadcast birbables since it enables to trigger them without a reference. Also, you may record and dump the history of broadcasts by plugging in a `BroadcastsRecorder`.
 
 ### EventManager.addContext()
 Adds a context to an EventManager. Returns the EventManager
@@ -188,4 +188,50 @@ Removes a Birbable from a Context. Returns the EventManager
     birbable : string,
     context : Context | symbol
   );
+```
+
+
+## BroadcastsRecorder : **_class_**
+May be plugged in a `EventManager` to record the history of broadcasts made by it.
+
+### BroadcastsRecorder.size()
+The total amount of stored undumped broadcasts
+
+```javascript
+  BroadcastsRecorder.size();
+```
+
+### BroadcastsRecorder.nextOffset()
+The next offset that the method `.read()` will use
+
+```javascript
+  BroadcastsRecorder.nextOffset();
+```
+
+### BroadcastsRecorder.read()
+Read an entry of the undumped Broadcasts records.
+If executed with no arugments, it will read the next entry each execution.
+
+```javascript
+  BroadcastsRecorder.read(index ?: number);
+```
+
+### BroadcastsRecorder.writeState()
+Writes the state to the undumped broadcast list. Returns `void`;
+
+Beware of using this method yourself, it will make this instance record a change
+that may not have happened!
+```javascript
+  BroadcastsRecorder.writeState(
+    procedureName : string,
+    contextState : Context,
+    data ?: any
+  );
+```
+
+### BroadcastsRecorder.dump()
+Reads the list of recorded broadcasts and clears it
+
+```javascript
+  BroadcastsRecorder.dump();
 ```

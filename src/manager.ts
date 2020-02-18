@@ -1,4 +1,5 @@
 import { Birbable } from './types';
+import { BroadcastsRecorder } from './broadcasts-recorder';
 import { Context } from './context';
 
 /**
@@ -10,6 +11,18 @@ export class EventManager {
    * @readonly A Map of added contexts
    */
   private readonly __contexts : Map<string | symbol, Context> = new Map();
+
+  /**
+   * @public
+   * @readonly The dump controller for this instance of the EventManager
+   */
+  public readonly broadcasts ?: BroadcastsRecorder;
+
+  public constructor (
+    broadcasts ?: BroadcastsRecorder
+  ) {
+    this.broadcasts = broadcasts;
+  }
 
   /**
    * Adds a context to this event manager.
@@ -41,14 +54,16 @@ export class EventManager {
 
     if (chosenContext === undefined) {
       this.__contexts.forEach(
-        (selectedContext) => {
-          selectedContext.trigger(birbable, descriptable);
+        (currentContext) => {
+          this.broadcasts?.writeState(birbable, currentContext, descriptable);
+          currentContext.trigger(birbable, descriptable);
         }
       );
 
       return this;
     }
 
+    this.broadcasts?.writeState(birbable, chosenContext, descriptable);
     chosenContext.trigger(birbable, descriptable);
     return this;
   }
