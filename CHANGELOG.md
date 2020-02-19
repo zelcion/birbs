@@ -2,8 +2,11 @@
 This document contains the releases and what changed between them.
 If you got any doubts don't hesitate to ask me a question.
 
+## **v0.7.0-rc2** 2019-02-18
+- BroadcastRecorder now supports event listeners
+
 ## **v0.7.0-rc1** 2019-02-18
-- Added Broadcast History entity.
+- Added BroadcastRecorder entity.
 - Added Broadcasts property on the EventManager.
 - Updated Typescript Version to ^3.7.4.
 

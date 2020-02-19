@@ -58,3 +58,9 @@ export type BirbsOption = {
 };
 
 export type Birbable = Procedure | Pipeline;
+
+export enum BroadcastsRecorderEvents {
+  WRITE = 'write',
+  DUMP = 'dump',
+  READ = 'read'
+};

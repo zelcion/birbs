@@ -1,5 +1,6 @@
 import { describe, it } from 'mocha';
 import { BroadcastsRecorder } from '../src/broadcasts-recorder';
+import { BroadcastsRecorderEvents } from '../src/types';
 import { Context } from '../src/context';
 import { EventManager } from '../src/manager';
 import { expect } from 'chai';
@@ -8,12 +9,13 @@ import { Procedure } from '../src/procedure';
 
 describe('[ BIRBS API ]', () => {
   it('Context fires events successfully', () => {
+    let callbackExecuted = false;
     class TestContext extends Context {
       public text = 'text ';
     }
 
     class TestProcedure extends Procedure {
-      private counter = 1;
+      public counter = 1;
 
       public async execute (context : TestContext, descriptable ?: number ) : Promise<void> {
         context.text = context.text + this.counter;
@@ -31,6 +33,11 @@ describe('[ BIRBS API ]', () => {
 
     manager.addContext(contextCreated).addBirbable(procedureCreated, contextId);
 
+    broadcastController.on(BroadcastsRecorderEvents.DUMP, () => {
+      callbackExecuted = true;
+      expect(procedureCreated.counter).to.be.above(1);
+    });
+
     manager.broadcast('TestProcedure', contextId, 8);
     expect(contextCreated.text).to.be.equal('text 1');
 
@@ -39,6 +46,7 @@ describe('[ BIRBS API ]', () => {
 
     expect(manager.broadcasts.dump().length).to.be.equal(2);
     expect(manager.broadcasts.dump().length).to.be.equal(0);
+    expect(callbackExecuted).to.be.true;
   });
 
   it('Pipelines executes in order', (done) => {
@@ -52,7 +60,7 @@ describe('[ BIRBS API ]', () => {
       }
     }
 
-    class DivideCounter extends Procedure {
+    class TimedDivideCounter extends Procedure {
       async execute(context : NumberContext) : Promise<void> {
         return new Promise((resolve) => {
           setTimeout(() => {
@@ -69,7 +77,7 @@ describe('[ BIRBS API ]', () => {
       }
     }
     const addProcedure = new AddToCounter({ lifetime: 'SINGLE' });
-    const divideProcedure = new DivideCounter({ lifetime: 'SINGLE' });
+    const divideProcedure = new TimedDivideCounter({ lifetime: 'SINGLE' });
     const microAddProcedure = new MicroAddToCounter({ lifetime: 'SINGLE' });
 
     class MutationPipeline extends Pipeline {};

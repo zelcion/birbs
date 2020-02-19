@@ -194,22 +194,35 @@ Removes a Birbable from a Context. Returns the EventManager
 ## BroadcastsRecorder : **_class_**
 May be plugged in a `EventManager` to record the history of broadcasts made by it.
 
-### BroadcastsRecorder.size()
-The total amount of stored undumped broadcasts
+The `BroadcastsRecorder` class emits three events: `"read"`, `"write"` and `"dump"` which can be listened to using `.on()` method, and have their listeners removed using `.off()`. All these events recieve as an argument an Array of `Broadcasts`.
+
+> ## The Broadcasts interface:
+> 
+> ```typescript
+> interface Broadcast {
+>   procedureName : string;
+>   contextState : Context & any;
+>   data ?: any;
+> }
+> ```
+> 
+
+### BroadcastsRecorder.size
+The total amount of stored undumped broadcasts. Returns a number.
 
 ```javascript
-  BroadcastsRecorder.size();
+  BroadcastsRecorder.size;
 ```
 
-### BroadcastsRecorder.nextOffset()
-The next offset that the method `.read()` will use
+### BroadcastsRecorder.nextOffset
+The next offset that the method `.read()` will use. Returns a number.
 
 ```javascript
-  BroadcastsRecorder.nextOffset();
+  BroadcastsRecorder.nextOffset;
 ```
 
 ### BroadcastsRecorder.read()
-Read an entry of the undumped Broadcasts records.
+Read an entry of the undumped Broadcasts records. Emits a `"read"` event.
 If executed with no arugments, it will read the next entry each execution.
 
 ```javascript
@@ -217,7 +230,7 @@ If executed with no arugments, it will read the next entry each execution.
 ```
 
 ### BroadcastsRecorder.writeState()
-Writes the state to the undumped broadcast list. Returns `void`;
+Writes the state to the undumped broadcast list. Returns `void`. Emits a `"write"` event.
 
 Beware of using this method yourself, it will make this instance record a change
 that may not have happened!
@@ -230,7 +243,7 @@ that may not have happened!
 ```
 
 ### BroadcastsRecorder.dump()
-Reads the list of recorded broadcasts and clears it
+Reads the list of recorded broadcasts and clears it. Emits a `"dump"` event.
 
 ```javascript
   BroadcastsRecorder.dump();

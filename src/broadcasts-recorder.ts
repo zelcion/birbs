@@ -1,4 +1,6 @@
+import { BroadcastsRecorderEvents } from './types';
 import { Context } from './context';
+import { EventEmitter } from 'events';
 
 interface Broadcast {
   procedureName : string;
@@ -11,6 +13,8 @@ interface Broadcast {
  * of the said EventManager.
  */
 export class BroadcastsRecorder {
+  private readonly __eventEmitter = new EventEmitter();
+
   /**
    * @private The list of broadcasts that still haven't been dumped
    */
@@ -35,6 +39,7 @@ export class BroadcastsRecorder {
       this.readOffset += 1;
     }
 
+    this.__eventEmitter.emit(BroadcastsRecorderEvents.READ, [result]);
     return result;
   }
 
@@ -62,6 +67,7 @@ export class BroadcastsRecorder {
     };
 
     this.__undumpedBroadcasts.set(this.size + 1, newEntry);
+    this.__eventEmitter.emit(BroadcastsRecorderEvents.WRITE, [newEntry]);
 
     return;
   }
@@ -79,6 +85,29 @@ export class BroadcastsRecorder {
     this.__undumpedBroadcasts.clear();
     this.readOffset = 0;
 
+    this.__eventEmitter.emit(BroadcastsRecorderEvents.DUMP, result);
     return result;
+  }
+
+  /**
+   * Listens to an event that is emitted by this BroadcastsRecorder instance
+   * @param event The event to listen to.
+   * @param callback The callback to be executed when the event is emitted.
+   */
+  public on(event : BroadcastsRecorderEvents, callback : (broadcasts : Broadcast[]) => void) : this {
+    this.__eventEmitter.on(event, callback);
+
+    return this;
+  }
+
+  /**
+   * Removes a listener from this BroadcastsRecorder instance
+   * @param event The event to remove listener from.
+   * @param callback The listener callback.
+   */
+  public off(event : BroadcastsRecorderEvents, callback : (broadcasts : Broadcast[]) => void) : this {
+    this.__eventEmitter.removeListener(event, callback);
+
+    return this;
   }
 }
