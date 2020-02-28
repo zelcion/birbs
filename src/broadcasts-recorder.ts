@@ -32,10 +32,19 @@ export class BroadcastsRecorder {
    */
   public readOffset = 0;
 
+  /**
+   * Reads an entry from the records
+   * Beware that unbound methods or getters/setters are not saved on the records.
+   * @param index the index of the record to be read
+   */
   public read(index ?: number) : Broadcast | undefined {
-    const result = this.__undumpedBroadcasts.get(index ?? this.nextOffset);
+    const inputReadIndex = (index ?? this.nextOffset);
+    const selectedReadIndex = inputReadIndex >= this.size
+      ? this.size
+      : inputReadIndex;
+    const result = this.__undumpedBroadcasts.get(selectedReadIndex);
 
-    if (index === undefined && result !== undefined) {
+    if (index === undefined && result !== undefined && inputReadIndex <= this.size) {
       this.readOffset += 1;
     }
 
@@ -73,7 +82,8 @@ export class BroadcastsRecorder {
   }
 
   /**
-   * Reads the list of recorded broadcasts and clears it
+   * Reads the list of recorded broadcasts and clears it.
+   * Beware that unbound methods or getters/setters are not saved on the records.
    */
   public dump() : Broadcast[] {
     const result : Broadcast[] = [];

@@ -55,16 +55,16 @@ export class EventManager {
     if (chosenContext === undefined) {
       this.__contexts.forEach(
         (currentContext) => {
-          this.broadcasts?.writeState(birbable, currentContext, descriptable);
           currentContext.trigger(birbable, descriptable);
+          this.broadcasts?.writeState(birbable, currentContext, descriptable);
         }
       );
 
       return this;
     }
 
-    this.broadcasts?.writeState(birbable, chosenContext, descriptable);
     chosenContext.trigger(birbable, descriptable);
+    this.broadcasts?.writeState(birbable, chosenContext, descriptable);
     return this;
   }
 

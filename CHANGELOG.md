@@ -2,6 +2,11 @@
 This document contains the releases and what changed between them.
 If you got any doubts don't hesitate to ask me a question.
 
+## **v0.7.0** 2019-02-28
+### Bugfix:
+- BroadcastRecorder: Reading now stops at the maximum reading offset
+- Write event on BroadcastRecorder is now dispatched after the context has already been modified by the procedures
+
 ## **v0.7.0-rc2** 2019-02-18
 - BroadcastRecorder now supports event listeners
 
