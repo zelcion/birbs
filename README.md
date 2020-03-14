@@ -13,6 +13,8 @@ Whenever programming or designing any application, we need to setup communicatio
 
 Although Node's plain events can be more than enough to get that desired decoupling, it could also do better! Birbs provides the funcionality of Node's events with a sweet sweet interface that requires almost no extra work to be done!
 
+And this comes bundled with typescript out of the box too :)
+
 ## And How Does That Work? 
 Birbs gives context and extensibility to Node's events.
 
@@ -46,15 +48,33 @@ If your IDE or editor shows you properties or methods which are not documented, 
 ## Context : **_class_**
 A Context defines a group of information available to a Procedure or Pipeline when it gets executed. It may have any Bibrbable instance signed on it.
 
-The constructor takes a string as an Identifier, used to map the context in a `Manager`.
+> As for version 0.8+, The context has the hability to handle errors thrown anywhere during the execution of your procedures. For more information, check the "Handling Promise Rejections" section.
+
+The constructor takes an option object for the only parameter.
+```javascript
+ContextOptions : {
+  identifier : string | symbol;
+  errorHandler ?: HandlerFunction
+}
+```
 
 ### Context.identifier  ~~---~~  **_readonly property : string | symbol_**
 Identifier of the context.
 
 ### Context.trigger()  ~~---~~  **_method : this_**
-Triggers the execution of a signed `Birbable`. Accepts as an argument a signed birbable name and optionally, extra information to be passed to the birbable to be triggered.
+Triggers the execution of a signed `Birbable`. Accepts as an argument an options object, and extra information to be passed to the birbable to be triggered.
+
+The TriggerOptions interface:
 ```javascript
-context.trigger('Birbable Name', extraInfo);
+TriggerOptions = {
+  context ?: symbol | string;
+  birbable : string;
+  errorHandler ?: HandlerFunction;
+};
+```
+
+```javascript
+context.trigger(options: TriggerOptions, descriptable?: any);
 ```
 
 ### Context.sign()  ~~---~~  **_method : this_**
@@ -105,10 +125,9 @@ This class is supposed to be extended, but you **MUST NOT** override its `execut
 The constructor accepts as arguments:
  - options: The options of the Birbable
  - onFinish: Callback executed when the pipeline finishes, which receives as argument the context.
- - onFail: If any of the procedures promises get rejected, this function will be called, or an error will be thrown
 
 ```javascript
-new Pipeline(option, onFinish?, onFail?);
+new Pipeline(option, onFinish?, );
 ```
 
 ### Pipeline.__type  ~~---~~  **_readonly property : "PIPELINE"_**
@@ -165,11 +184,11 @@ The context argument is optional. If ommited, the manager will try triggering th
 
 ```javascript
   EventManager.broadcast(
-    birbable : string,
-    context ?: string,
+    options: TriggerOptions
     descriptable ?: any
   );
 ```
+
 ### EventManager.addBirbable()
 Adds a Birbable to a Context. Returns the EventManager
 
@@ -248,3 +267,10 @@ Reads the list of recorded broadcasts and clears it. Emits a `"dump"` event.
 ```javascript
   BroadcastsRecorder.dump();
 ```
+
+-----
+
+# Guides
+
+## Handling Promise Rejections / Errors
+In order to understand how can we handle errors in Birbs, it is required that you provide to the context what it is supposed to do in case of a failure; you can do it so through either the `.broadcast` or the `.trigger` methods. The function recieves an `Error` as the only argument.

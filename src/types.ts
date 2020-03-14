@@ -2,6 +2,13 @@ import { Context } from './context';
 import { Pipeline } from './pipeline';
 import { Procedure } from './procedure';
 
+export type HandlerFunction = (error : Error) => void;
+export type TriggerOptions = {
+  context ?: symbol | string;
+  birbable : string;
+  errorHandler ?: HandlerFunction;
+};
+
 /**
  * The base class that a context uses to trigger events.
  * @abstract
@@ -27,13 +34,7 @@ export abstract class BirbsRunnable {
     return this.__group;
   }
 
-  /**
-   * Method used when the Runnable was triggered
-   * @param context The context used to execute this function in
-   */
-  abstract execute (context : Context) : Promise<void>;
-
-  abstract execute (context : Context, descriptable) : Promise<void>;
+  abstract execute (context : Context, descriptable ?: unknown) : Promise<void>;
 
   public constructor (options : BirbsOption = { lifetime: 'SINGLE' }) {
 

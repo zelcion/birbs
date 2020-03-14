@@ -11,7 +11,7 @@ class TestContext extends Context {
   public visibleProperty =  'Hello World';
 
   constructor () {
-    super('identifier');
+    super({ identifier: 'identifier'});
 
     this.privatePropertyWasModified = this.privatePropertyWasModified.bind(this);
   }
@@ -52,11 +52,11 @@ describe('Broadcast Recorder', () => {
       .addBirbable(new ChangeInternalProperty({ lifetime: 'DURABLE' }), 'identifier');
   });
 
-  it('Reading progresstion', () => {
+  it('Reading progression', () => {
     eventManager
-      .broadcast('ChangeExternalProperty', 'identifier', 'thisText')
-      .broadcast('ChangeInternalProperty', 'identifier', 'thatText')
-      .broadcast('ChangeExternalProperty', 'identifier', 'thoseTexts');
+      .broadcast({ birbable: 'ChangeExternalProperty' }, 'thisText')
+      .broadcast({ birbable: 'ChangeInternalProperty' }, 'thatText')
+      .broadcast({ birbable: 'ChangeExternalProperty' }, 'thoseTexts');
 
     expect(recorder.readOffset).to.be.equal(0);
     expect(recorder.read()).to.not.be.empty;
@@ -73,9 +73,9 @@ describe('Broadcast Recorder', () => {
 
   it('Selected Reading', () => {
     eventManager
-      .broadcast('ChangeExternalProperty', 'identifier', 'thisText')
-      .broadcast('ChangeInternalProperty', 'identifier', 'thatText')
-      .broadcast('ChangeExternalProperty', 'identifier', 'thoseTexts');
+      .broadcast({ birbable: 'ChangeExternalProperty' }, 'thisText')
+      .broadcast({ birbable: 'ChangeInternalProperty' }, 'thatText')
+      .broadcast({ birbable: 'ChangeExternalProperty' }, 'thoseTexts');
 
     expect(recorder.readOffset).to.be.equal(0);
     expect(recorder.read(1)).to.not.be.empty;
@@ -85,9 +85,9 @@ describe('Broadcast Recorder', () => {
 
   it('Dumping and Cleaning', () => {
     eventManager
-      .broadcast('ChangeExternalProperty', 'identifier', 'thisText')
-      .broadcast('ChangeInternalProperty', 'identifier', 'thatText')
-      .broadcast('ChangeExternalProperty', 'identifier', 'thoseTexts');
+      .broadcast({ birbable: 'ChangeExternalProperty' }, 'thisText')
+      .broadcast({ birbable: 'ChangeInternalProperty' }, 'thatText')
+      .broadcast({ birbable: 'ChangeExternalProperty' }, 'thoseTexts');
 
     expect(recorder.size).to.be.equal(3);
     expect(recorder.dump().length).to.be.equal(3);
@@ -102,7 +102,7 @@ describe('Broadcast Recorder', () => {
       done();
     });
 
-    eventManager.broadcast('ChangeInternalProperty', 'identifier', 'thoseTexts');
+    eventManager.broadcast({ birbable: 'ChangeInternalProperty'}, 'thoseTexts');
     recorder.read();
   });
 
@@ -113,7 +113,7 @@ describe('Broadcast Recorder', () => {
       done();
     });
 
-    eventManager.broadcast('ChangeInternalProperty', 'identifier', 'sampleText');
+    eventManager.broadcast({ birbable: 'ChangeInternalProperty'}, 'sampleText');
   });
 
   it('Dump Event', (done) => {
@@ -123,9 +123,9 @@ describe('Broadcast Recorder', () => {
     });
 
     eventManager
-      .broadcast('ChangeExternalProperty', 'identifier', 'thisText')
-      .broadcast('ChangeInternalProperty', 'identifier', 'thatText')
-      .broadcast('ChangeExternalProperty', 'identifier', 'thoseTexts');
+      .broadcast({ birbable: 'ChangeExternalProperty' }, 'thisText')
+      .broadcast({ birbable: 'ChangeInternalProperty' }, 'thatText')
+      .broadcast({ birbable: 'ChangeExternalProperty' }, 'thoseTexts');
 
     recorder.dump();
   });

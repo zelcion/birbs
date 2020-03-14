@@ -2,6 +2,23 @@
 This document contains the releases and what changed between them.
 If you got any doubts don't hesitate to ask me a question.
 
+## **v0.8.0** 2019-03-13
+### Breaking Changes:
+- Pipeline:
+  - No longer has the option to catch errors, this is now handled by the context
+
+- Context:
+  - No longer uses node's events to handle execution of the procedures, It is now handled internally.
+  - Now has an extra property to handle uncaught exceptions of Procedures
+  - The `.trigger()` method now has a different signature to accept an exception handler function.
+
+- Manager:
+  - Contract radically changed for `.broadcast()` function, now follows the Context's `.trigger()` method.
+
+### Other Changes:
+- Birbables:
+  - Had a slight change to the `.execute()` method Type. Now the type of the descriptable in the `.execute()` method is propagated through the function.
+
 ## **v0.7.0** 2019-02-28
 ### Bugfix:
 - BroadcastRecorder: Reading now stops at the maximum reading offset

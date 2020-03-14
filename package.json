@@ -1,12 +1,13 @@
 {
   "name": "birbs",
-  "version": "0.7.0",
+  "version": "0.8.0",
   "description": "Capture and admire all your joyful events with this event manager and encapsulator!",
   "main": "./lib/index.js",
   "types": "./lib/index.d.ts",
   "scripts": {
     "test": "mocha",
-    "compile": "tsc"
+    "compile": "tsc",
+    "lint": "eslint --max-warnings 0 './*{(test),(src)}/*.{ts,js}'"
   },
   "repository": {
     "type": "git",
@@ -24,9 +25,12 @@
     "birbs",
     "event",
     "events",
-    "encapsulating",
+    "encapsulation",
+    "framework",
     "manager",
-    "birb"
+    "birb",
+    "context",
+    "domain"
   ],
   "author": "flgmjr",
   "license": "GPL-3.0",
@@ -44,6 +48,6 @@
     "eslint": "^6.8.0",
     "mocha": "^6.2.1",
     "ts-node": "^8.4.1",
-    "typescript": "^3.7.4"
+    "typescript": "^3.8.3"
   }
 }

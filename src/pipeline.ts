@@ -15,8 +15,6 @@ export abstract class Pipeline extends BirbsRunnable {
 
   private readonly steps : Map<string, Procedure> = new Map();
   private readonly onFinish ?: CallableFunction;
-  private readonly onFail ?: CallableFunction;
-
   /**
    * Adds a step to the pipeline
    * @param procedure The next procedure to execute
@@ -35,30 +33,19 @@ export abstract class Pipeline extends BirbsRunnable {
   public constructor (
     options : BirbsOption,
     onFinish ?: CallableFunction,
-    onFail ?: (error : Error) => void
   ) {
     super(options);
     this.onFinish = onFinish;
-    this.onFail = onFail;
 
     this.addStep = this.addStep.bind(this);
     this.execute = this.execute.bind(this);
     this.runPipeline = this.runPipeline.bind(this);
-    this.catchFail = this.catchFail.bind(this);
   }
 
-  private catchFail () : (error : Error) => void {
-    return ((error) : void => {
-      if (this.onFail !== undefined) { this.onFail(error); return; }
-
-      throw error;
-    });
-  }
-
-  private async runPipeline(executionList : Birbable[], context : Context, descriptable?) : Promise<void> {
+  private async runPipeline <T>(executionList : Birbable[], context : Context, descriptable ?: T) : Promise<void> {
 
     for (const birbable of executionList) {
-      await birbable.execute(context, descriptable).catch(this.catchFail());
+      await birbable.execute(context, descriptable);
     }
 
     if (this.onFinish !== undefined) this.onFinish(context);
@@ -70,7 +57,7 @@ export abstract class Pipeline extends BirbsRunnable {
    * the context type that you are working with so it is possible to
    * assert the type that you're working with
    */
-  public async execute (context : Context, descriptable?) : Promise<void> {
+  public async execute <T>(context : Context, descriptable ?: T) : Promise<void> {
     const executionList : Birbable[] = [];
     this.steps.forEach((birbable) => {
       executionList.push(birbable);

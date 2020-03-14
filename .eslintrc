@@ -13,7 +13,8 @@
   },
   "parserOptions": {
     "ecmaVersion": 2018,
-    "sourceType": "module"
+    "sourceType": "module",
+    "project": "./tsconfig.json"
   },
   "extends": [
     "plugin:@typescript-eslint/recommended"
@@ -24,6 +25,7 @@
     "@typescript-eslint/no-parameter-properties": ["off"],
     "@typescript-eslint/no-use-before-define": ["off"],
     "@typescript-eslint/no-unused-vars": ["error"],
+    "@typescript-eslint/no-floating-promises": "error",
     "@typescript-eslint/explicit-function-return-type": ["error"],
     "no-trailing-spaces": ["warn"],
     "@typescript-eslint/semi": ["error", "always"],

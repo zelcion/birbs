@@ -1,12 +1,6 @@
-import { Birbable } from './types';
-import { EventEmitter } from 'events';
+import { Birbable, HandlerFunction, TriggerOptions } from './types';
 
-class CustomEmitter extends EventEmitter {
-  constructor(listeners) {
-    super();
-    this.setMaxListeners(listeners);
-  }
-};
+type ContextOptions = { identifier : string | symbol; errorHandler ?: HandlerFunction };
 
 /**
  * Context defines a group of information available to a Procedure when
@@ -19,9 +13,10 @@ export class Context {
   private readonly __identifier : string | symbol;
 
   /**
-   * @readonly @private Local EventEmmiter instance
+   * @readonly @private error handler of errors that might happen
+   * while executing proedures
    */
-  private readonly __emitter : EventEmitter = new CustomEmitter(100);
+  private readonly __errorHandler ?: HandlerFunction;
 
   /**
    * @readonly @private Map of Birbables registered in the context
@@ -38,23 +33,42 @@ export class Context {
   /**
    * @param identifier The value to set the local identifier of the context
    */
-  public constructor (identifier : string | symbol) {
-    this.__identifier = identifier;
+  public constructor (contextOtions : ContextOptions) {
+    this.__identifier = contextOtions.identifier;
+    this.__errorHandler = contextOtions.errorHandler?.bind(this);
   }
 
   /**
    * Triggers the execution of a signed `Birbable`.
    * @param name Identifier of what needs to be triggered in this context
    * @param descriptable Additional Information to be sent to the Birbable
+   * @param errorHandler A function to catch errors in case of unexpected promise Rejections
    */
-  public trigger (name : string, descriptable?) : this {
-    if (!this.__birbables.has(name)) {
+  public trigger <T>(options : TriggerOptions, descriptable ?: T) : this {
+    const foundBirbable = this.__birbables.get(options.birbable);
+    if (foundBirbable === undefined) {
       return this;
     }
 
-    this.__unmount(this.__birbables.get(name));
-    this.__emitter.emit(name, this, descriptable);
+    this.__unmount(foundBirbable);
+
+    const execution = foundBirbable.execute(this, descriptable);
+
+    if (execution instanceof Promise) {
+      execution.catch(this.__activeErrorHandler(options.errorHandler));
+    }
+
     return this;
+  }
+
+  private __activeErrorHandler (errorHandler ?: HandlerFunction) : HandlerFunction {
+    const defaultHandler = (error : Error) : void => {
+      console.log(`The context "${this.constructor.name}" had an Unhandled Promise Rejection.`);
+
+      throw error;
+    };
+
+    return (this.__errorHandler ?? errorHandler) ?? defaultHandler;
   }
 
   /**
@@ -90,7 +104,7 @@ export class Context {
    */
   public sign (birbable : Birbable) : this {
     this.__birbables.set(birbable.constructor.name, birbable);
-    this.__addToListener(birbable);
+    // this.__addToListener(birbable);
 
     return this;
   }
@@ -104,24 +118,9 @@ export class Context {
 
     if (foundBirbable !== undefined) {
       this.__birbables.delete(birbable.constructor.name);
-      this.__emitter.removeAllListeners(birbable.constructor.name);
+      // this.__emitter.removeAllListeners(birbable.constructor.name);
     }
 
     return this;
-  }
-
-  /**
-   * Adds a listener of a birbable to the context
-   * @private
-   * @param birbable
-   */
-  private __addToListener (birbable : Birbable) : void {
-    if (birbable.belongsToGroup) {
-      this.__emitter.once(birbable.constructor.name, birbable.execute);
-      return;
-    }
-
-    const method = birbable.lifetime === 'DURABLE' ? 'on' : 'once';
-    this.__emitter[method](birbable.constructor.name, birbable.execute);
   }
 }

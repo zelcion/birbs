@@ -1,4 +1,4 @@
-import { Birbable } from './types';
+import { Birbable, TriggerOptions } from './types';
 import { BroadcastsRecorder } from './broadcasts-recorder';
 import { Context } from './context';
 
@@ -44,27 +44,26 @@ export class EventManager {
 
   /**
    * Broadcasts a Birbable to a specific context on this manager, or to all of them
-   * @param birbable The specified name of the birbable entity
-   * @param context Optional - the context to trigger the Birbable
+   * @param options The configuration for this broadcast
    * @param descriptable Optional - Additional info to be sent to the Birbable
    */
-  public broadcast(birbable : string, context ?: string | symbol, descriptable?) : EventManager {
-    const chosenContext = (context !== undefined)?
-      this.__contexts.get(context) : undefined;
+  public broadcast<T>(options : TriggerOptions, descriptable ?: T) : EventManager {
+    const chosenContext = (options.context !== undefined)?
+      this.__contexts.get(options.context) : undefined;
 
     if (chosenContext === undefined) {
       this.__contexts.forEach(
         (currentContext) => {
-          currentContext.trigger(birbable, descriptable);
-          this.broadcasts?.writeState(birbable, currentContext, descriptable);
+          currentContext.trigger(options, descriptable);
+          this.broadcasts?.writeState(options.birbable, currentContext, descriptable);
         }
       );
 
       return this;
     }
 
-    chosenContext.trigger(birbable, descriptable);
-    this.broadcasts?.writeState(birbable, chosenContext, descriptable);
+    chosenContext.trigger(options, descriptable);
+    this.broadcasts?.writeState(options.birbable, chosenContext, descriptable);
     return this;
   }
 
