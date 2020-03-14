@@ -2,6 +2,11 @@
 This document contains the releases and what changed between them.
 If you got any doubts don't hesitate to ask me a question.
 
+## **v0.8.1** 2019-03-14
+### Small changes:
+- Context:
+  - Now it is possible to set the errorHandler in runtime
+
 ## **v0.8.0** 2019-03-13
 ### Breaking Changes:
 - Pipeline:

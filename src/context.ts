@@ -16,7 +16,7 @@ export class Context {
    * @readonly @private error handler of errors that might happen
    * while executing proedures
    */
-  private readonly __errorHandler ?: HandlerFunction;
+  private __errorHandler ?: HandlerFunction;
 
   /**
    * @readonly @private Map of Birbables registered in the context
@@ -28,6 +28,10 @@ export class Context {
    */
   public get identifier () : string | symbol {
     return this.__identifier;
+  }
+
+  public set errorHandler (handler : HandlerFunction) {
+    this.__errorHandler = handler;
   }
 
   /**

@@ -273,4 +273,4 @@ Reads the list of recorded broadcasts and clears it. Emits a `"dump"` event.
 # Guides
 
 ## Handling Promise Rejections / Errors
-In order to understand how can we handle errors in Birbs, it is required that you provide to the context what it is supposed to do in case of a failure; you can do it so through either the `.broadcast` or the `.trigger` methods. The function recieves an `Error` as the only argument.
+In order to understand how can we handle errors in Birbs, it is required that you provide to the context what it is supposed to do in case of a failure; you can do it so through either the `.broadcast` or the `.trigger` methods, by setting the property on the context, or during runtime. The function recieves an `Error` as the only argument.
