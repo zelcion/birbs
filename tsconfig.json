@@ -18,11 +18,12 @@
     "declaration": true
   },
   "inlcude": [
+    "./index.ts",
     "src/*",
-    "src/**/*"
+    "src/**/*",
+    "test/*"
   ],
   "exclude": [
-    "test/*",
     "lib/*"
   ]
 }

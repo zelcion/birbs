@@ -5,3 +5,4 @@ tsconfig.json
 test
 package-lock.json
 pratical-examples
+lib/test

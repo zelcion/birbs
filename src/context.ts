@@ -1,12 +1,15 @@
 import { Birbable, HandlerFunction, TriggerOptions } from './types';
 
 type ContextOptions = { identifier : string | symbol; errorHandler ?: HandlerFunction };
+// eslint-disable-next-line @typescript-eslint/ban-types, @typescript-eslint/no-explicit-any
+type ContextData<T extends Object = any> = { [K in keyof T] : T[K] };
 
 /**
- * Context defines a group of information available to a Procedure when
+ * Context defines a group of domain information. It available to a Procedure when
  * it gets executed. A context may have any Bibrbable instance signed on it.
  */
-export class Context {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export class Context<D = any> {
   /**
    * @readonly @private identifier of the context entity
    */
@@ -22,6 +25,18 @@ export class Context {
    * @readonly @private Map of Birbables registered in the context
    */
   private readonly __birbables : Map<string, Birbable> = new Map();
+
+  private readonly __contextState : Partial<ContextData<D>> = {};
+
+  public get contextState() : Partial<ContextData<D>> {
+    return this.__contextState;
+  }
+
+  public setContextState(information : Partial<ContextData<D>>) : this {
+    Object.assign(this.__contextState, information);
+
+    return this;
+  }
 
   /**
    * @returns identifier of the context entity
@@ -48,7 +63,7 @@ export class Context {
    * @param descriptable Additional Information to be sent to the Birbable
    * @param errorHandler A function to catch errors in case of unexpected promise Rejections
    */
-  public trigger <T>(options : TriggerOptions, descriptable ?: T) : this {
+  public trigger <K>(options : TriggerOptions, descriptable ?: K) : this {
     const foundBirbable = this.__birbables.get(options.birbable);
     if (foundBirbable === undefined) {
       return this;
