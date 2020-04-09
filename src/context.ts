@@ -2,7 +2,7 @@ import { Birbable, HandlerFunction, TriggerOptions } from './types';
 
 type ContextOptions = { identifier : string | symbol; errorHandler ?: HandlerFunction };
 // eslint-disable-next-line @typescript-eslint/ban-types, @typescript-eslint/no-explicit-any
-type ContextData<T extends Object = any> = { [K in keyof T] : T[K] };
+type ContextData<T extends Object> = Partial<T>;
 
 /**
  * Context defines a group of domain information. It available to a Procedure when
@@ -26,13 +26,20 @@ export class Context<D = any> {
    */
   private readonly __birbables : Map<string, Birbable> = new Map();
 
-  private readonly __contextState : Partial<ContextData<D>> = {};
+  private readonly __contextState : ContextData<D> = {};
 
-  public get contextState() : Partial<ContextData<D>> {
+  /**
+   * The current state data of the context
+   */
+  public get contextState() : ContextData<D> {
     return this.__contextState;
   }
 
-  public setContextState(information : Partial<ContextData<D>>) : this {
+  /**
+   * Sets a state to the context
+   * @param information The object information to be set
+   */
+  public setContextState(information : ContextData<D>) : this {
     Object.assign(this.__contextState, information);
 
     return this;

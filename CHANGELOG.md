@@ -2,7 +2,7 @@
 This document contains the releases and what changed between them.
 If you got any doubts don't hesitate to ask me a question.
 
-## **v0.9.0-alpha** 2020-04-09
+## **v0.9.1** 2020-04-08
 ### New:
 - Context:
   - Contexts now carry a state that can be acessed and modified.

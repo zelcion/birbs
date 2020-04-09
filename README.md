@@ -2,7 +2,7 @@
 
 # Birbs 
 
-Capture and admire all your joyful events with this event manager!
+Fly your application with an event-driven model inside rich contexts!
 
 -------
 ## What is Birbs?
@@ -43,10 +43,12 @@ Before we get started, let's get to know our entities. There's `Context`, `Proce
 
 > When saying `Birbable`, it means either a Procedure or a Pipeline.
 
-If your IDE or editor shows you properties or methods which are not documented, it means that they are private, nd you should not use them directly.
+If your IDE or editor shows you properties or methods which are not documented, it means that they are private, and you should not use them directly.
 
-## Context : **_class_**
-A Context defines a group of information available to a Procedure or Pipeline when it gets executed. It may have any Bibrbable instance signed on it.
+## Context\<T> : **_class_**
+A Context defines a group of informations. It is available to a Procedure or Pipeline when it gets executed. It may have any Bibrbable instance signed on it.
+
+The context instance has a `contextState` property which holds its current state. If you're using typescript you may pass the type of this property as the generic type of the class when using it. Example: `Context<{ name: string }>`. If omitted, the context will accept any object as a state.
 
 > As for version 0.8+, The context has the hability to handle errors thrown anywhere during the execution of your procedures. For more information, check the "Handling Promise Rejections" section.
 
@@ -56,6 +58,13 @@ ContextOptions : {
   identifier : string | symbol;
   errorHandler ?: HandlerFunction
 }
+```
+
+### Context.setContextState ~~---~~ **_method : this_**
+Sets or updates a value of information on the context. `T` is of the
+
+```javascript
+context.setContextState(information: T):
 ```
 
 ### Context.identifier  ~~---~~  **_readonly property : string | symbol_**

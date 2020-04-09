@@ -1,9 +1,14 @@
 {
   "name": "birbs",
-  "version": "0.9.0-alpha",
-  "description": "Capture and admire all your joyful events with this event manager and encapsulator!",
+  "version": "0.9.1",
+  "description": "Fly your application with an event-driven model inside rich contexts!",
   "main": "./lib/index.js",
   "types": "./lib/index.d.ts",
+  "files": [
+    "lib/src",
+    "lib/index*",
+    ".eslintrc"
+  ],
   "scripts": {
     "test": "mocha",
     "compile": "tsc",
