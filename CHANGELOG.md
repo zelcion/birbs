@@ -2,6 +2,11 @@
 This document contains the releases and what changed between them.
 If you got any doubts don't hesitate to ask me a question.
 
+## **v1.0.0** 2020-06-11
+### Breaking Changes:
+- Contexts:
+  - Had the state (introduced in v9.1) removed
+
 ## **v0.9.1** 2020-04-08
 ### New:
 - Context:

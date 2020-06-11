@@ -6,10 +6,9 @@ type ContextData<T extends Object> = Partial<T>;
 
 /**
  * Context defines a group of domain information. It available to a Procedure when
- * it gets executed. A context may have any Bibrbable instance signed on it.
+ * it gets executed. A context may have any Bibrbable instance signed to it.
  */
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export class Context<D = any> {
+export class Context {
   /**
    * @readonly @private identifier of the context entity
    */
@@ -26,25 +25,6 @@ export class Context<D = any> {
    */
   private readonly __birbables : Map<string, Birbable> = new Map();
 
-  private readonly __contextState : ContextData<D> = {};
-
-  /**
-   * The current state data of the context
-   */
-  public get contextState() : ContextData<D> {
-    return this.__contextState;
-  }
-
-  /**
-   * Sets a state to the context
-   * @param information The object information to be set
-   */
-  public setContextState(information : ContextData<D>) : this {
-    Object.assign(this.__contextState, information);
-
-    return this;
-  }
-
   /**
    * @returns identifier of the context entity
    */
@@ -59,9 +39,9 @@ export class Context<D = any> {
   /**
    * @param identifier The value to set the local identifier of the context
    */
-  public constructor (contextOtions : ContextOptions) {
-    this.__identifier = contextOtions.identifier;
-    this.__errorHandler = contextOtions.errorHandler?.bind(this);
+  public constructor (contextOptions : ContextOptions) {
+    this.__identifier = contextOptions.identifier;
+    this.__errorHandler = contextOptions.errorHandler?.bind(this);
   }
 
   /**
