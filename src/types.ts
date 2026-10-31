@@ -3,6 +3,27 @@ import { Pipeline } from './pipeline';
 import { Procedure } from './procedure';
 
 export type HandlerFunction = (error : Error) => void;
+
+/**
+ * The shape of the observable state bag held by a Context.
+ */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export type ContextData<D = any> = Partial<D>;
+
+/**
+ * Payload emitted on the Context "state" event whenever observable context
+ * state changes. Lets Procedures, Pipelines and external observers react to
+ * a state transition instead of only being triggered explicitly.
+ */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export type ContextStateChange<D = any> = {
+  /** The context whose state changed. */
+  context : Context<D>;
+  /** The full current state of the context. */
+  state : ContextData<D>;
+  /** Keys that were added or overwritten by the change. */
+  changed : string[];
+};
 export type TriggerOptions = {
   context ?: symbol | string;
   birbable : string;

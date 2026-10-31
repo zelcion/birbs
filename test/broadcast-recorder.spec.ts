@@ -129,4 +129,16 @@ describe('Broadcast Recorder', () => {
 
     recorder.dump();
   });
+
+  it('removeProcedure unsigns a Birbable so a later broadcast is a no-op', () => {
+    testContext.visibleProperty = 'Hello World';
+
+    eventManager
+      .addBirbable(new ChangeExternalProperty({ lifetime: 'DURABLE' }), 'identifier')
+      .removeProcedure(new ChangeExternalProperty({ lifetime: 'DURABLE' }), 'identifier');
+
+    eventManager.broadcast({ birbable: 'ChangeExternalProperty' }, 'overwritten');
+
+    expect(testContext.visibleProperty).to.be.equal('Hello World');
+  });
 });

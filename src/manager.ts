@@ -86,4 +86,13 @@ export class EventManager {
     this.__contexts.get(context).unsign(birbable);
     return this;
   }
+
+  /**
+   * Documented alias for removeBirbable: removes a Birbable from a Context.
+   * @param birbable The birbable to remove
+   * @param context The context to remove the birbable from
+   */
+  public removeProcedure(birbable : Birbable, context : string | symbol) : EventManager {
+    return this.removeBirbable(birbable, context);
+  }
 };

@@ -1,15 +1,19 @@
-import { Birbable, HandlerFunction, TriggerOptions } from './types';
+import { Birbable, ContextData, ContextStateChange, HandlerFunction, TriggerOptions } from './types';
+import { EventEmitter } from 'events';
+
+/**
+ * The event name emitted by a Context whenever its observable state changes.
+ */
+export const CONTEXT_STATE_EVENT = 'state';
 
 type ContextOptions = { identifier : string | symbol; errorHandler ?: HandlerFunction };
-// eslint-disable-next-line @typescript-eslint/ban-types, @typescript-eslint/no-explicit-any
-type ContextData<T extends Object> = Partial<T>;
 
 /**
  * Context defines a group of domain information. It available to a Procedure when
  * it gets executed. A context may have any Bibrbable instance signed on it.
  */
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-export class Context<D = any> {
+export class Context<D = any> extends EventEmitter {
   /**
    * @readonly @private identifier of the context entity
    */
@@ -42,6 +46,12 @@ export class Context<D = any> {
   public setContextState(information : ContextData<D>) : this {
     Object.assign(this.__contextState, information);
 
+    this.emit(CONTEXT_STATE_EVENT, {
+      changed: Object.keys(information),
+      context: this,
+      state: this.__contextState
+    } as ContextStateChange<D>);
+
     return this;
   }
 
@@ -60,6 +70,7 @@ export class Context<D = any> {
    * @param identifier The value to set the local identifier of the context
    */
   public constructor (contextOtions : ContextOptions) {
+    super();
     this.__identifier = contextOtions.identifier;
     this.__errorHandler = contextOtions.errorHandler?.bind(this);
   }

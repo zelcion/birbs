@@ -213,8 +213,8 @@ Removes a Birbable from a Context. Returns the EventManager
 
 ```javascript
   EventManager.removeProcedure(
-    birbable : string,
-    context : Context | symbol
+    birbable : Birbable,
+    context : string | symbol
   );
 ```
 
