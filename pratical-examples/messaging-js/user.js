@@ -19,6 +19,6 @@ module.exports = class User {
       messageContent, this.userName
     );
 
-    manager.broadcast('MessagePipeline', this.currentChatRoom, aMessage);
+    manager.broadcast({ birbable: 'MessagePipeline', context: this.currentChatRoom }, aMessage);
   }
 }

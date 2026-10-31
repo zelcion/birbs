@@ -3,7 +3,7 @@ const { manager } = require("./config");
 
 module.exports = class ChatRoom extends Context {
   constructor (name, id) {
-    super(id);
+    super({ identifier: id });
     this.chatRoomName = name;
     this.messages = [];
     this.participants = [];
