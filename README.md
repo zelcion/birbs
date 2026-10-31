@@ -31,11 +31,11 @@ npm i birbs --save
 
 -----
 ## Pratical Examples:
-### [**Messaging Application:** *Notifications [Js]*](https://github.com/flgmjr/birbs/tree/master/pratical-examples/messaging-js)
+### Messaging Application: Notifications [Js] (`pratical-examples/messaging-js`)
 
 Let's say here we got to do a chat Application. We would like to have the features of different Rooms and message notifications!
 
-For the sake of simplicity, we will not create all the servers and routes, just execute it in Node directly. Take a look on the linked folder above or [here](https://github.com/flgmjr/birbs/tree/master/pratical-examples/messaging-js).
+For the sake of simplicity, we will not create all the servers and routes, just execute it in Node directly. The example requires the compiled output, so first compile the library with `npm run compile` (which runs `tsc`), then run it with `node pratical-examples/messaging-js/index.js`.
 
 ----
 # API Reference:
@@ -61,10 +61,10 @@ ContextOptions : {
 ```
 
 ### Context.setContextState ~~---~~ **_method : this_**
-Sets or updates a value of information on the context. `T` is of the
+Sets or updates a value of information on the context. The `information` argument is the object of data merged into the context state, and the method returns `this` for chaining.
 
 ```javascript
-context.setContextState(information: T):
+context.setContextState(information): this;
 ```
 
 ### Context.identifier  ~~---~~  **_readonly property : string | symbol_**
@@ -107,7 +107,7 @@ This class is supposed to be extended so you can add your own implementation of 
 Type of birbable. Used internally to do assertions.
 
 ### Procedure.lifetime  ~~---~~  **_readonly property : string_**
-Lifetime of the Birbable, can be either `"DURABLE"` OR `"SINGLE"`. `"DURABLE"` means the Birbable will be able to be used on a context until it gets manually removed with `.unisgn()`; `"SINGLE"` lifetime birbables can only be executed once per `sign()`.
+Lifetime of the Birbable, can be either `"DURABLE"` OR `"SINGLE"`. `"DURABLE"` means the Birbable will be able to be used on a context until it gets manually removed with `.unsign()`; `"SINGLE"` lifetime birbables can only be executed once per `sign()`.
 
 ### Procedure.group  ~~---~~  **_readonly property : symbol_**
 Procedures and Pipelines can have this property set at the constructor. If a Birbable with this property set is triggered, all of the other belonging with the same group get removed as well.
@@ -143,10 +143,10 @@ new Pipeline(option, onFinish?, );
 Type of birbable. Used internally to do assertions.
 
 ### Pipeline.lifetime  ~~---~~  **_readonly property : string_**
-Lifetime of the Birbable, can be either `"DURABLE"` OR `"SINGLE"`. `"DURABLE"` means the Birbable will be able to be used on a context until it gets manually removed with `.unisgn()`; `"SINGLE"` lifetime birbables can only be executed once per `sign()`.
+Lifetime of the Birbable, can be either `"DURABLE"` OR `"SINGLE"`. `"DURABLE"` means the Birbable will be able to be used on a context until it gets manually removed with `.unsign()`; `"SINGLE"` lifetime birbables can only be executed once per `sign()`.
 
 ### Pipeline.group  ~~---~~  **_readonly property : symbol_**
-Pipelines and Pipelines can have this property set at the constructor. If a Birbable with this property set is triggered, all of the other belonging with the same group get removed as well.
+Procedures and Pipelines can have this property set at the constructor. If a Birbable with this property set is triggered, all of the other belonging with the same group get removed as well.
 
 ### Pipeline.belongsToGroup  ~~---~~  **_readonly property : boolean_**
 Wether this Birbable belongs to a group or not.
@@ -183,7 +183,7 @@ Adds a context to an EventManager. Returns the EventManager
 Removes a context from an EventManager. Returns the EventManager
 
 ```javascript
-  EventManager.removeContext(context: string);
+  EventManager.removeContext(context: string | symbol);
 ```
 
 ### EventManager.broadcast()
@@ -204,7 +204,7 @@ Adds a Birbable to a Context. Returns the EventManager
 ```javascript
   EventManager.addBirbable(
     birbable : Birbable,
-    context : Context | symbol
+    context : string | symbol
   );
 ```
 
