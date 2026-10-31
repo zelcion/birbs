@@ -1,0 +1,89 @@
+# company — the team that develops the app itself.
+# Fábio talks to the Steward; real code changes happen in the Change mission,
+# each activation on its own git worktree and branch of this repository.
+
+vars:
+  Repo: "/home/fabu/Documents/birbs"
+  Codex: "/home/fabu/.vscode/extensions/openai.chatgpt-26.1021.22027-linux-x64/bin/linux-x86_64/codex"
+  ReviewTools: "Read,Grep,Glob,Bash(git diff:*),Bash(git status:*),Bash(git log:*),Bash(git show:*),Bash(npm run:*),Bash(npm test:*),Bash(npx vitest:*),Bash(ls:*),Bash(cat:*)"
+  # The Steward never edits the repository itself: changes go through the Change mission.
+  StewardTools: "${ReviewTools}"
+  ChangeReviewTools: "${ReviewTools}"
+  ChangeLeadTools: "${ChangeReviewTools},Bash(git add:*),Bash(git commit:*)"
+  # The TechLead also commits the approved change on the mission branch.
+  LeadTools: "${ReviewTools},Bash(git add:*),Bash(git commit:*)"
+
+army:
+  name: Birbs-Team
+  settings:
+    max_concurrent_runs: 3
+
+units:
+  - name: Desk
+    purpose: purpose/desk.md
+    working_directory: "${Repo}"
+    lead: Steward
+    agents:
+      - name: Steward
+        soul: souls/steward.md
+        executor:
+          - opencode
+          - { kind: claude, model: sonnet, args: [ --allowedTools, "${StewardTools}" ] }
+          - { kind: codex, model: gpt-6.1-sol, command: "${Codex}" }
+        time_limit: 50
+        permissions:
+          army_board: manage
+          assigns_objectives_to: [Change]
+      - name: Vision
+        soul: souls/vision.md
+        executor:
+          - opencode
+          - { kind: claude, model: sonnet, args: [ --allowedTools, "${ReviewTools}" ] }
+          - { kind: codex, model: gpt-6.1-sol, command: "${Codex}" }
+        time_limit: 15
+
+missions:
+  - name: Change
+    purpose: purpose/change.md
+    owned_by: Desk/Steward
+    starting_agent: TechLead
+    allowed_locations: ["${Repo}"]
+    workspace_setup: |
+      set -eu
+      if [ ! -e node_modules ] && [ ! -L node_modules ]; then
+        ln -s "${Repo}/node_modules" node_modules
+      fi
+      test -d node_modules
+    recovery_attempt_limit: 2
+    agents:
+      - name: TechLead
+        soul: souls/techlead.md
+        executor:
+          - opencode
+          - { kind: claude, model: sonnet, args: [ --allowedTools, "${ChangeLeadTools}" ] }
+          - { kind: codex, model: gpt-6.1-sol, command: "${Codex}", git_write: true }
+        time_limit: 15
+        permissions:
+          finish_objective: true
+          request_superior_assistance: true
+      - name: Engineer
+        soul: souls/engineer.md
+        executor:
+          - opencode
+          - { kind: codex, model: gpt-6.1-sol, command: "${Codex}" }
+          - { kind: claude, model: sonnet, args: [ --allowedTools, "${ChangeLeadTools}" ] }
+        time_limit: 40
+      - name: Reviewer
+        soul: souls/reviewer.md
+        executor:
+          - opencode
+          - { kind: claude, model: sonnet, args: [ --allowedTools, "${ChangeReviewTools}" ] }
+          - { kind: codex, model: gpt-6.1-sol, command: "${Codex}" }
+        time_limit: 15
+      - name: Designer
+        soul: souls/designer.md
+        executor:
+          - opencode
+          - { kind: claude, model: sonnet, args: [ --allowedTools, "${ChangeReviewTools}" ] }
+          - { kind: codex, model: gpt-6.1-sol, command: "${Codex}" }
+        time_limit: 15
