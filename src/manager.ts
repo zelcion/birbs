@@ -73,7 +73,9 @@ export class EventManager {
    * @param context The context to add the birbable to
    */
   public addBirbable(birbable : Birbable, context : string | symbol) : EventManager {
-    this.__contexts.get(context).sign(birbable);
+    const targetContext = this.__contexts.get(context);
+    if (targetContext === undefined) { return this; }
+    targetContext.sign(birbable);
     return this;
   }
 
@@ -83,7 +85,9 @@ export class EventManager {
    * @param context The context to remove the birbable from
    */
   public removeBirbable(birbable : Birbable, context : string | symbol) : EventManager {
-    this.__contexts.get(context).unsign(birbable);
+    const targetContext = this.__contexts.get(context);
+    if (targetContext === undefined) { return this; }
+    targetContext.unsign(birbable);
     return this;
   }
 
