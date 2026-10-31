@@ -17,7 +17,7 @@
     },
     "declaration": true
   },
-  "inlcude": [
+  "include": [
     "./index.ts",
     "src/*",
     "src/**/*",
